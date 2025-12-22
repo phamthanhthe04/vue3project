@@ -1,0 +1,314 @@
+.icon {
+  mask-image: url('../icon/ICON.svg');
+  width: 24px;
+  height: 24px;
+  mask-repeat: no-repeat;
+  background-color: currentColor;
+  display: inline-block;
+}
+
+.icon-default {
+  background: url('/icon/ICON.svg') no-repeat;
+  width: 24px;
+  height: 24px;
+}
+
+/* ==================== HEADER ICONS ==================== */
+/* icon 3 chắm */
+.header-item {
+  width: 32px;
+  height: 32px;
+}
+
+.icon-hd-app {
+  width: 20px;
+  height: 16px;
+  mask-position: -14px -48px;
+  background-color: #ffffff;
+}
+
+/* icon tìm kiếm */
+.icon-hd-search {
+  width: 17px;
+  height: 16px;
+  mask-position: -1px -658px;
+}
+
+/* icon toàn cầu */
+.icon-hd-global {
+  mask-position: 0px -608px;
+}
+
+/* icon loa */
+.icon-hd-speaker {
+  width: 16px;
+  height: 16px;
+  mask-position: -42px -658px;
+}
+
+/* icon cửa hàng */
+.icon-hd-store {
+  mask-position: -291px -411px;
+  width: 19px;
+  height: 18px;
+}
+
+/* icon người dùng */
+.icon-hd-adduser {
+  mask-position: -314px -611px;
+  width: 20px;
+  height: 18px;
+}
+
+/* icon tin nhắn */
+.icon-hd-message {
+  mask-position: -145px -610px;
+  width: 22px;
+  height: 20px;
+}
+
+/* icon thông báo */
+.icon-hd-notification {
+  mask-position: -2px -634px;
+  width: 20px;
+  height: 21px;
+}
+
+/* icon trợ giúp */
+.icon-hd-help {
+  mask-position: -74px -610px;
+  width: 20px;
+  height: 20px;
+}
+
+/* icon menu thêm */
+.icon-hd-moremenu {
+  mask-position: -50px -610px;
+  width: 20px;
+  height: 20px;
+}
+
+/* icon kiến thức */
+.icon-hd-knowledge {
+  mask-position: -244px -894px;
+  width: 20px;
+  height: 20px;
+}
+
+/* icon avatar */
+.icon-hd-avatar {
+  mask-position: -93px -943px;
+  width: 42px;
+  height: 42px;
+}
+
+/* ==================== SIDEBAR ICONS ==================== */
+/* icon tin tuyển dụng */
+.icon-sb-recruiment {
+  mask-position: -94px -113px;
+}
+
+/* icon ứng viên */
+.icon-sb-candidate {
+  mask-position: -24px -112px;
+}
+
+/* icon lịch phỏng vấn */
+.icon-sb-calendar {
+  mask-position: -144px -113px;
+}
+
+/* Kho tiềm năng */
+.icon-sb-potential {
+  mask-position: 0px -112px;
+}
+
+/* Chiến dịch tuyển dụng */
+.icon-sb-campaign {
+  mask-position: -73px -633px;
+}
+
+/* công việc */
+.icon-sb-job {
+  mask-position: -336px -113px;
+}
+
+/* aiMaketting */
+.icon-sb-aimarketing {
+  mask-position: -160px -248px;
+}
+
+/* icon trao đổi với ứng viên */
+.icon-sb-communication {
+  mask-position: -72px -845px;
+}
+
+/* báo cáo */
+.icon-sb-report {
+  mask-position: -73px -114px;
+}
+
+/* icon khác */
+.icon-sb-other {
+  mask-position: -359px -614px;
+}
+
+/* ==================== ACTION ICONS ==================== */
+/* icon thêm ứng viên */
+.icon-add-candidate {
+  width: 20px;
+  height: 20px;
+  mask-position: -20px -656px;
+}
+
+/* icon mũi tên xuống */
+.icon-arrow-down {
+  width: 16px;
+  height: 16px;
+  mask-position: -32px -48px;
+}
+
+/* icon lọc */
+.icon-filter {
+  width: 20px;
+  height: 20px;
+  mask-position: -40px -656px;
+}
+
+/* icon xuất khẩu */
+.icon-export {
+  width: 20px;
+  height: 20px;
+  mask-position: -60px -656px;
+}
+
+/* icon xem hoạt động */
+.icon-activity {
+  width: 20px;
+  height: 20px;
+  mask-position: 0 -844px;
+}
+
+/* icon cài đặt */
+.icon-settings {
+  mask-position: -24px -608px;
+}
+
+/* icon mũi tên trái */
+.icon-arrow-left {
+  width: 16px;
+  height: 16px;
+  mask-position: -60px -696px;
+}
+
+/* icon mũi tên phải */
+.icon-arrow-right {
+  width: 16px;
+  height: 16px;
+  mask-position: -40px -696px;
+}
+
+/* icon đóng */
+.icon-close {
+  width: 22px;
+  height: 22px;
+  mask-position: -73px -136px;
+}
+
+/* icon thêm */
+.icon-plus {
+  width: 14px;
+  height: 14px;
+  mask-position: -369px -705px;
+}
+
+/* icon drop down */
+.icon-dropdown {
+  width: 16px;
+  height: 16px;
+  mask-position: -33px -48px;
+}
+
+/* icon bút sửa */
+.icon-edit {
+  width: 17px;
+  height: 16px;
+  mask-position: -182px -658px;
+}
+
+.icon-circle-edit {
+  min-width: 7px;
+  height: 7px;
+  width: 7px;
+  border-radius: 50%;
+  background-color: black;
+}
+
+/* ==================== FORM ICONS ==================== */
+.icon-edit-candidate {
+  width: 16px;
+  height: 16px;
+}
+
+/* icon số điện thoại */
+.icon-phone-number {
+  mask-position: -192px 0;
+}
+
+/* icon email */
+.icon-email {
+  width: 20px;
+  height: 20px;
+  mask-position: -260px -656px;
+}
+
+/* icon địa chỉ */
+.icon-address {
+  mask-position: -160px -15px;
+}
+
+/* icon skype */
+.icon-skype {
+  mask-position: -240px -80px;
+}
+
+/* icon facebook */
+.icon-facebook {
+  mask-position: -240px -64px;
+}
+
+/* icon zalo */
+.icon-zalo {
+  mask-position: -366px -140px;
+}
+
+/* icon liên kết khác */
+.icon-linker-other {
+  mask-position: -255px -64px;
+}
+
+/* ==================== SEARCH AI ==================== */
+.img-search-ai {
+  width: 16px;
+  height: 16px;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23999999"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>')
+    no-repeat center;
+  background-size: contain;
+  border: none;
+  cursor: pointer;
+}
+
+/* ==================== COLLAPSE ICONS ==================== */
+.icon-arrow-collapse {
+  width: 20px;
+  height: 20px;
+  mask-position: -32px -48px;
+  background-color: #ffffff;
+}
+
+.icon-arrow-expand {
+  width: 20px;
+  height: 20px;
+  mask-position: -60px -48px;
+  background-color: #ffffff;
+}

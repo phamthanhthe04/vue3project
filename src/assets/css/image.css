@@ -1,0 +1,43 @@
+.img-hd-background {
+  background-image: url('../images/navbar-bg-noel.ff04816e6511986f.svg');
+  background-position: left;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.img-hd-logo-recruitment {
+  background-image: url('../images/logo-recruitment-new.d56a0096f9a2229b.svg');
+  width: 32px;
+  height: 32px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.img-sb-background {
+  background-image: linear-gradient(
+    to bottom,
+    rgba(3, 22, 44, 1) 0%,
+    rgba(10, 35, 65, 0.95) 30%,
+    rgba(24, 55, 84, 0.85) 60%,
+    rgba(24, 55, 84, 0.7) 100%
+  );
+  background-position: bottom left;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+}
+
+.img-hd-avatar {
+  background-image: url('../images/avatar.png');
+  width: 32px;
+  height: 32px;
+  background-size: contain;
+  border-radius: 50%;
+  background-repeat: no-repeat;
+}
+.img-ct-search-ai {
+  background: url('../images/ai-search-candidate.svg');
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
