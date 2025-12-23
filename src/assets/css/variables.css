@@ -1,0 +1,109 @@
+/**
+ * CSS Variables for Candidate Modals
+ * Centralized design tokens for consistent styling
+ */
+
+:root {
+  /* ==================== COLORS ==================== */
+  --color-primary: #1890ff;
+  --color-primary-hover: #40a9ff;
+  --color-primary-active: #096dd9;
+  --color-primary-shadow: rgba(24, 144, 255, 0.2);
+  --color-primary-light: #f0f7ff;
+
+  --color-danger: #ff4d4f;
+  --color-success: #52c41a;
+  --color-warning: #faad14;
+
+  --color-text-primary: rgba(0, 0, 0, 0.85);
+  --color-text-secondary: rgba(0, 0, 0, 0.65);
+  --color-text-disabled: rgba(0, 0, 0, 0.25);
+  --color-text-placeholder: rgba(0, 0, 0, 0.25);
+
+  --color-border: #d9d9d9;
+  --color-border-hover: #40a9ff;
+  --color-border-focus: #40a9ff;
+
+  --color-bg-white: #ffffff;
+  --color-bg-gray: #fafafa;
+  --color-bg-hover: rgba(0, 0, 0, 0.04);
+  --color-bg-disabled: #f5f5f5;
+
+  --color-overlay: rgba(0, 0, 0, 0.45);
+
+  /* ==================== SPACING ==================== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-xxl: 32px;
+
+  /* ==================== FONT SIZES ==================== */
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+
+  /* ==================== FONT WEIGHTS ==================== */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ==================== LINE HEIGHTS ==================== */
+  --line-height-tight: 1.2;
+  --line-height-base: 1.5715;
+  --line-height-relaxed: 1.75;
+
+  /* ==================== BORDER RADIUS ==================== */
+  --radius-sm: 2px;
+  --radius-base: 6px;
+  --radius-lg: 8px;
+  --radius-circle: 50%;
+
+  /* ==================== SHADOWS ==================== */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 2px var(--color-primary-shadow);
+
+  /* ==================== TRANSITIONS ==================== */
+  --transition-fast: 0.15s;
+  --transition-base: 0.3s;
+  --transition-slow: 0.5s;
+
+  /* ==================== Z-INDEX ==================== */
+  --z-index-modal: 9999;
+  --z-index-dropdown: 1000;
+  --z-index-tooltip: 1001;
+
+  /* ==================== COMPONENT SPECIFIC ==================== */
+  /* Modal */
+  --modal-max-height: 85vh;
+  --modal-header-padding: var(--spacing-lg) var(--spacing-xl);
+  --modal-body-padding: var(--spacing-xl);
+  --modal-footer-padding: 10px var(--spacing-lg);
+
+  /* Form */
+  --form-input-height: 32px;
+  --form-input-padding: var(--spacing-xs) 11px;
+  --form-gap: var(--spacing-lg);
+  --form-section-gap: var(--spacing-xl);
+
+  /* Avatar */
+  --avatar-size-sm: 32px;
+  --avatar-size-base: 60px;
+  --avatar-size-lg: 80px;
+
+  /* Avatar Colors */
+  --avatar-color-pink: #f50057;
+  --avatar-color-blue: #2196f3;
+  --avatar-color-orange: #ff9800;
+  --avatar-color-cyan: #00bcd4;
+  --avatar-color-teal: #009688;
+  --avatar-color-purple: #9c27b0;
+  --avatar-color-green: #4caf50;
+}

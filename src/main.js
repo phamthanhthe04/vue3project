@@ -1,3 +1,4 @@
+import './assets/css/variables.css'
 import './assets/css/main.css'
 import './assets/css/icon.css'
 import './assets/css/image.css'

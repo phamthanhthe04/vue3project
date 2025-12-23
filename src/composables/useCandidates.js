@@ -259,7 +259,7 @@ export function useCandidates() {
   const clearAllData = () => {
     localStorage.removeItem(STORAGE_KEY)
     candidates.value = []
-    console.log('🗑️ Đã xóa tất cả dữ liệu')
+    console.log('Đã xóa tất cả dữ liệu')
   }
 
   // Khởi tạo khi component mount

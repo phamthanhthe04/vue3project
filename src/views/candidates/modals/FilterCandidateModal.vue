@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { CandidateStatus, CandidateSource, EducationLevel } from '../../../utils/enums'
-import MSButton from '@/components/controls/MSButton/MSButton.vue'
+import MSButton from '@/components/controls/ms-button/MSButton.vue'
 
 const props = defineProps({
   show: {

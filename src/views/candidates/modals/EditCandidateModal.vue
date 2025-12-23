@@ -1,13 +1,11 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
-import {
-  Gender,
-  Area,
-  CandidateSource,
-  EducationLevel,
-  CandidateStatus,
-} from '../../../utils/enums'
-import MSButton from '@/components/controls/MSButton/MSButton.vue'
+import { Gender, Area, CandidateSource, EducationLevel, CandidateStatus } from '@/utils/enums'
+import { VALIDATION_PATTERNS, VALIDATION_MESSAGES } from '@/constants'
+import { useToast } from '@/composables/useToast'
+import MSButton from '@/components/controls/ms-button/MSButton.vue'
+
+const { success, error } = useToast()
 
 const props = defineProps({
   show: {
@@ -21,6 +19,26 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'save'])
+
+// Chuyển đổi dd/MM/yyyy sang yyyy-MM-dd cho input type="date"
+function convertToDateInput(dateStr) {
+  if (!dateStr) return ''
+  const parts = dateStr.split('/')
+  if (parts.length === 3) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`
+  }
+  return dateStr
+}
+
+// Chuyển đổi yyyy-MM-dd sang dd/MM/yyyy
+function convertToDisplayDate(dateStr) {
+  if (!dateStr) return ''
+  const parts = dateStr.split('-')
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`
+  }
+  return dateStr
+}
 
 // Form data
 const formData = ref({
@@ -67,7 +85,7 @@ const sourceOptions = Object.values(CandidateSource)
 const educationLevelOptions = Object.values(EducationLevel)
 const statusOptions = Object.values(CandidateStatus)
 
-// Watch candidate prop to populate form
+// Watch candidate để populate form
 watch(
   () => props.candidate,
   (newCandidate) => {
@@ -102,7 +120,7 @@ watch(
         rating: newCandidate.rating || 0,
       }
 
-      // Set avatar if exists
+      // Set avatar
       avatarText.value = newCandidate.avatarText || ''
       avatarColor.value = newCandidate.avatarColor || 'blue'
       if (newCandidate.avatar) {
@@ -115,27 +133,7 @@ watch(
   { immediate: true },
 )
 
-// Convert dd/MM/yyyy to yyyy-MM-dd for input type="date"
-function convertToDateInput(dateStr) {
-  if (!dateStr) return ''
-  const parts = dateStr.split('/')
-  if (parts.length === 3) {
-    return `${parts[2]}-${parts[1]}-${parts[0]}`
-  }
-  return dateStr
-}
-
-// Convert yyyy-MM-dd to dd/MM/yyyy
-function convertToDisplayDate(dateStr) {
-  if (!dateStr) return ''
-  const parts = dateStr.split('-')
-  if (parts.length === 3) {
-    return `${parts[2]}/${parts[1]}/${parts[0]}`
-  }
-  return dateStr
-}
-
-// Handle avatar upload
+// Xử lý upload avatar
 const handleAvatarClick = () => {
   avatarInput.value?.click()
 }
@@ -152,30 +150,28 @@ const handleAvatarChange = (event) => {
   }
 }
 
+// Avatar display computed
+const hasImageAvatar = computed(() => !!avatarPreview.value)
+const hasTextAvatar = computed(() => !avatarPreview.value && !!avatarText.value)
+const showUploadPlaceholder = computed(() => !avatarPreview.value && !avatarText.value)
+
 // Handle close
-const handleClose = () => {
-  emit('close')
-}
+const handleClose = () => emit('close')
+const handleCancel = () => emit('close')
 
-// Handle cancel
-const handleCancel = () => {
-  emit('close')
-}
-
-// Handle save
 const handleSave = () => {
   // Validation
   if (!formData.value.fullName.trim()) {
-    alert('Vui lòng nhập họ và tên')
+    error(VALIDATION_MESSAGES.REQUIRED_FULLNAME)
     return
   }
 
-  if (formData.value.phone.trim() && !/^\d{10,15}$/.test(formData.value.phone.trim())) {
-    alert('Vui lòng nhập đúng định đạng số điện thoại (10-15 chữ số)')
+  if (formData.value.phone.trim() && !VALIDATION_PATTERNS.PHONE.test(formData.value.phone.trim())) {
+    error(VALIDATION_MESSAGES.INVALID_PHONE)
     return
   }
 
-  // Prepare updated candidate data
+  // Chuẩn bị dữ liệu đã cập nhật
   const updatedCandidate = {
     ...props.candidate,
     ...formData.value,
@@ -191,25 +187,12 @@ const handleSave = () => {
   emit('save', updatedCandidate)
 }
 
-// Handle click outside modal
+// Xử lý click bên ngoài modal
 const handleOverlayClick = (event) => {
   if (event.target === event.currentTarget) {
     handleClose()
   }
 }
-
-// Avatar display
-const hasImageAvatar = computed(() => {
-  return !!avatarPreview.value
-})
-
-const hasTextAvatar = computed(() => {
-  return !avatarPreview.value && !!avatarText.value
-})
-
-const showUploadPlaceholder = computed(() => {
-  return !avatarPreview.value && !avatarText.value
-})
 </script>
 
 <template>
@@ -247,19 +230,16 @@ const showUploadPlaceholder = computed(() => {
                       @click="handleAvatarClick"
                       title="Click để tải ảnh lên"
                     >
-                      <!-- Image Avatar -->
                       <img
                         v-if="hasImageAvatar"
                         :src="avatarPreview"
                         alt="Avatar"
                         class="avatar-image show"
                       />
-                      <!-- Text Avatar -->
                       <span v-else-if="hasTextAvatar" class="avatar-text-display">
                         {{ avatarText }}
                       </span>
-                      <!-- Upload Placeholder -->
-                      <span v-else class="avatar-placeholder-text"> Tải ảnh lên </span>
+                      <span v-else class="avatar-placeholder-text">Tải ảnh lên</span>
                     </button>
                   </div>
                 </div>
@@ -612,8 +592,8 @@ const showUploadPlaceholder = computed(() => {
 </template>
 
 <style scoped>
+@import '../../../assets/css/variables.css';
 @import '../../../assets/css/modal-add-candidate.css';
-
 /* Styles riêng cho edit modal */
 .form-section-edit {
   margin-bottom: 24px;

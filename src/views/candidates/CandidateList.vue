@@ -5,7 +5,10 @@ import { getStatusClass, getAvatarColorClass } from '../../utils/enums.js'
 import AddCandidateModal from '../../views/candidates/modals/AddCandidateModal.vue'
 import EditCandidateModal from '../../views/candidates/modals/EditCandidateModal.vue'
 import FilterCandidateModal from '../../views/candidates/modals/FilterCandidateModal.vue'
-import MSButton from '../../components/controls/MSButton/MSButton.vue'
+import MSButton from '@/components/controls/ms-button/MSButton.vue'
+import { useToast } from '@/composables/useToast'
+
+const { success, error, warning } = useToast()
 
 const {
   candidates,
@@ -57,10 +60,9 @@ const handleCloseModal = () => {
 const handleSaveCandidate = (candidateData) => {
   const result = addCandidate(candidateData)
   if (result) {
-    console.log('Thêm ứng viên thành công:', result.fullName)
+    showAddModal.value = false
+    // Toast sẽ hiển thị từ AddCandidateModal
   }
-  alert('Thêm ứng viên thành công!')
-  showAddModal.value = false
 }
 
 // Xử lý hover vào row
@@ -101,11 +103,12 @@ const handleCloseEditModal = () => {
 const handleSaveEditCandidate = (candidateData) => {
   const result = updateCandidate(candidateData.id, candidateData)
   if (result) {
-    console.log('Cập nhật ứng viên thành công:', result.fullName)
+    success('Cập nhật ứng viên thành công!')
+    showEditModal.value = false
+    selectedCandidate.value = null
+  } else {
+    error('Có lỗi xảy ra khi cập nhật ứng viên')
   }
-  alert('Cập nhật ứng viên thành công!')
-  showEditModal.value = false
-  selectedCandidate.value = null
 }
 
 // Xử lý mở modal filter
