@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Gender, Area, CandidateSource, EducationLevel, CandidateStatus } from '@/utils/enums'
 import { getAvatarText, getRandomAvatarColor } from '@/utils/avatarHelper'
 import { VALIDATION_PATTERNS, VALIDATION_MESSAGES, DEFAULT_VALUES } from '@/constants'
 import { useToast } from '@/composables/useToast'
 import MSButton from '@/components/controls/ms-button/MSButton.vue'
+import MSDateInput from '@/components/controls/ms-input/MSDateInput.vue'
 
 const { success, error } = useToast()
 
@@ -144,6 +145,7 @@ const handleSave = () => {
       from: formData.value.workPeriodFrom,
       to: formData.value.workPeriodTo,
     },
+    avatar: avatarPreview.value, // Lưu base64 string thay vì File object
     avatarText: getAvatarText(formData.value.fullName),
     avatarColor: getRandomAvatarColor(),
     isEmployee: DEFAULT_VALUES.IS_EMPLOYEE,
@@ -227,12 +229,9 @@ onMounted(() => {
         <!-- Ngày sinh & Giới tính -->
         <div class="form-row-split">
           <div class="form-group-half">
-            <label class="form-label">Ngày sinh</label>
-            <input
+            <MSDateInput
               v-model="formData.dateOfBirth"
-              type="text"
-              class="form-input"
-              placeholder="dd/MM/yyyy"
+              label="Ngày sinh"
             />
           </div>
           <div class="form-group-half">

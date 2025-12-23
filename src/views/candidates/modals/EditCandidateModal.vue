@@ -1,9 +1,10 @@
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Gender, Area, CandidateSource, EducationLevel, CandidateStatus } from '@/utils/enums'
 import { VALIDATION_PATTERNS, VALIDATION_MESSAGES } from '@/constants'
 import { useToast } from '@/composables/useToast'
 import MSButton from '@/components/controls/ms-button/MSButton.vue'
+import MSDateInput from '@/components/controls/ms-input/MSDateInput.vue'
 
 const { success, error } = useToast()
 
@@ -263,8 +264,7 @@ const handleOverlayClick = (event) => {
                   <!-- Ngày sinh & Giới tính -->
                   <div class="form-row-split-edit">
                     <div class="form-group-half-edit">
-                      <label class="form-label">Ngày sinh</label>
-                      <input v-model="formData.dateOfBirth" type="date" class="form-input" />
+                      <MSDateInput v-model="formData.dateOfBirth" label="Ngày sinh" />
                     </div>
                     <div class="form-group-half-edit">
                       <label class="form-label">Giới tính</label>
@@ -594,6 +594,7 @@ const handleOverlayClick = (event) => {
 <style scoped>
 @import '../../../assets/css/variables.css';
 @import '../../../assets/css/modal-add-candidate.css';
+
 /* Styles riêng cho edit modal */
 .form-section-edit {
   margin-bottom: 24px;

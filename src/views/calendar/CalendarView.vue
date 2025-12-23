@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import MSTable from '../../components/controls/ms-table/MSTable.vue'
 
 const pageTitle = ref('Lịch')
 </script>

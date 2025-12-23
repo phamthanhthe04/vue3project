@@ -312,3 +312,10 @@
   mask-position: -60px -48px;
   background-color: #ffffff;
 }
+
+/* icon lịch */
+.icon-calendar {
+  width: 16px;
+  height: 16px;
+  mask-position: -342px -678px;
+}

@@ -3,6 +3,7 @@ import CandidateList from '../views/candidates/CandidateList.vue'
 import RecruitmentNews from '../views/recruiments/RecruitmentNews.vue'
 import CalendarView from '../views/calendar/CalendarView.vue'
 import PlaceholderView from '../views/common/PlaceholderView.vue'
+import JobView from '../views/job/jobList.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -54,7 +55,7 @@ const router = createRouter({
     {
       path: '/jobs',
       name: 'jobs',
-      component: PlaceholderView,
+      component: JobView,
       meta: {
         title: 'Công việc',
       },
