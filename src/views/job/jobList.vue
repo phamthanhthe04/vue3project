@@ -1,395 +1,567 @@
 <script setup>
-import { ref } from 'vue'
-import MSTable from '../../components/controls/ms-table/MSTable.vue'
+import { ref, computed } from 'vue'
+import { useCandidates } from '../../composables/useCandidates.js'
 import { getStatusClass, getAvatarColorClass } from '../../utils/enums.js'
+import AddCandidateModal from '@/views/candidates/modals/AddCandidateModal.vue'
+import EditCandidateModal from '@/views/candidates/modals/EditCandidateModal.vue'
+import FilterCandidateModal from '@/views/candidates/modals/FilterCandidateModal.vue'
+import MSButton from '@/components/controls/ms-button/MSButton.vue'
+import MSTable from '@/components/controls/ms-table/MSTable.vue'
+import { useToast } from '@/composables/useToast'
+import { candidateFields, formatCellValue } from './candidateTableConfig.js'
+import { getAvatarText, getRandomAvatarColor } from '@/utils/avatarHelper.js'
+const { success, error, warning } = useToast()
 
-// Demo mode switch
-const demoMode = ref('job') // 'job' hoặc 'candidate'
+// ============================================
+// PHẦN 1: DATA & STATE MANAGEMENT
+// ============================================
 
-// Job fields
-const jobFields = [
-  {
-    key: 'jobName',
-    label: 'Tên công việc',
-    type: 'custom',
-  },
-  {
-    key: 'department',
-    label: 'Phòng ban',
-    type: 'text',
-  },
-  {
-    key: 'location',
-    label: 'Địa điểm',
-    type: 'text',
-  },
-  {
-    key: 'postedDate',
-    label: 'Ngày đăng',
-    type: 'date',
-  },
-  {
-    key: 'status',
-    label: 'Trạng thái',
-    type: 'text',
-  },
-]
+// Lấy data từ composable
+const {
+  candidates,
+  loading,
+  searchKeyword,
+  filters,
+  filteredCandidates,
+  activeFiltersCount,
+  searchCandidates,
+  addCandidate,
+  updateCandidate,
+  deleteCandidate,
+  updateFilters,
+  resetFilters,
+} = useCandidates()
 
-const jobRows = ref([
-  {
-    id: 1,
-    jobName: 'Nhân viên kinh doanh',
-    department: 'Kinh doanh',
-    location: 'Hà Nội',
-    postedDate: '2024-06-01',
-    status: 'Mở',
-  },
-  {
-    id: 2,
-    jobName: 'Lập trình viên Frontend',
-    department: 'Công nghệ thông tin',
-    location: 'Hồ Chí Minh',
-    postedDate: '2024-05-28',
-    status: 'Đóng',
-  },
-  {
-    id: 3,
-    jobName: 'Chuyên viên marketing',
-    department: 'Marketing',
-    location: 'Đà Nẵng',
-    postedDate: '2024-06-03',
-    status: 'Mở',
-  },
-  {
-    id: 4,
-    jobName: 'Kỹ sư phần mềm Backend',
-    department: 'Công nghệ thông tin',
-    location: 'Hà Nội',
-    postedDate: '2024-06-05',
-    status: 'Mở',
-  },
-  {
-    id: 5,
-    jobName: 'Nhân viên hành chính',
-    department: 'Hành chính',
-    location: 'Hà Nội',
-    postedDate: '2024-05-30',
-    status: 'Đóng',
-  },
-])
+// Modal states
+const showAddModal = ref(false)
+const showEditModal = ref(false)
+const showFilterModal = ref(false)
+const selectedCandidate = ref(null)
 
-// Candidate fields - Simplified version
-const candidateFields = [
-  {
-    key: 'fullName',
-    label: 'Họ và tên',
-    type: 'custom',
-    width: '200px',
-  },
-  {
-    key: 'phone',
-    label: 'Số điện thoại',
-    type: 'text',
-    width: '120px',
-  },
-  {
-    key: 'email',
-    label: 'Email',
-    type: 'text',
-    width: '180px',
-  },
-  {
-    key: 'source',
-    label: 'Nguồn',
-    type: 'text',
-    width: '120px',
-  },
-  {
-    key: 'status',
-    label: 'Trạng thái',
-    type: 'custom',
-    width: '150px',
-  },
-  {
-    key: 'rating',
-    label: 'Đánh giá',
-    type: 'custom',
-    width: '120px',
-  },
-  {
-    key: 'dateApplied',
-    label: 'Ngày ứng tuyển',
-    type: 'text',
-    width: '120px',
-  },
-]
+// Selection state - Tích hợp với MSTable
+const selectedCandidates = ref([])
 
-const candidateRows = ref([
-  {
-    id: 1,
-    fullName: 'Nguyễn Văn A',
-    phone: '0987654321',
-    email: 'nguyenvana@example.com',
-    source: 'LinkedIn',
-    status: 'Nộp hồ sơ',
-    rating: 5,
-    dateApplied: '15/06/2024',
-    avatar: '',
-    avatarText: 'NA',
-    avatarColor: 'blue',
-  },
-  {
-    id: 2,
-    fullName: 'Trần Thị B',
-    phone: '0912345678',
-    email: 'tranthib@example.com',
-    source: 'Facebook',
-    status: 'Phỏng vấn',
-    rating: 4,
-    dateApplied: '10/06/2024',
-    avatar: '',
-    avatarText: 'TB',
-    avatarColor: 'pink',
-  },
-  {
-    id: 3,
-    fullName: 'Lê Văn C',
-    phone: '0934567890',
-    email: 'levanc@example.com',
-    source: 'Giới thiệu',
-    status: 'Đạt',
-    rating: 5,
-    dateApplied: '05/06/2024',
-    avatar: '',
-    avatarText: 'LC',
-    avatarColor: 'green',
-  },
-])
+// Pagination state
+const currentPage = ref(1)
+const pageSize = ref(25)
 
-const selectedRows = ref([])
+// ============================================
+// PHẦN 2: COMPUTED PROPERTIES
+// ============================================
 
-// Xử lý sửa công việc
-const handleEdit = (row) => {
-  console.log('Edit:', row)
-  alert(`Sửa: ${demoMode.value === 'job' ? row.jobName : row.fullName}`)
+/**
+ * Pagination: Lấy candidates cho trang hiện tại
+ */
+const paginatedCandidates = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredCandidates.value.slice(start, end)
+})
+
+/**
+ * Tính tổng số trang
+ */
+const totalPages = computed(() => {
+  return Math.ceil(filteredCandidates.value.length / pageSize.value)
+})
+
+/**
+ * Thông tin hiển thị phân trang
+ */
+const paginationInfo = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value + 1
+  const end = Math.min(currentPage.value * pageSize.value, filteredCandidates.value.length)
+  return { start, end, total: filteredCandidates.value.length }
+})
+
+// ============================================
+// PHẦN 3: METHODS - SEARCH & FILTER
+// ============================================
+
+/**
+ * Xử lý tìm kiếm
+ */
+const handleSearch = (event) => {
+  searchCandidates(event.target.value)
+  currentPage.value = 1 // Reset về trang 1 khi search
 }
 
-// Xử lý xóa công việc
-const handleDelete = (row) => {
-  const name = demoMode.value === 'job' ? row.jobName : row.fullName
-  if (confirm(`Bạn có chắc muốn xóa "${name}"?`)) {
-    const rows = demoMode.value === 'job' ? jobRows : candidateRows
-    const index = rows.value.findIndex((r) => r.id === row.id)
-    if (index !== -1) {
-      rows.value.splice(index, 1)
-      console.log('Deleted:', name)
+/**
+ * Xử lý mở modal filter
+ */
+const handleOpenFilter = () => {
+  showFilterModal.value = true
+}
+
+/**
+ * Xử lý đóng modal filter
+ */
+const handleCloseFilter = () => {
+  showFilterModal.value = false
+}
+
+/**
+ * Xử lý áp dụng filter
+ */
+const handleApplyFilter = (newFilters) => {
+  updateFilters(newFilters)
+  showFilterModal.value = false
+  currentPage.value = 1 // Reset về trang 1 khi filter
+}
+
+/**
+ * Xử lý reset filter
+ */
+const handleResetFilter = () => {
+  resetFilters()
+  showFilterModal.value = false
+  currentPage.value = 1
+}
+
+// ============================================
+// PHẦN 4: METHODS - CRUD OPERATIONS
+// ============================================
+
+/**
+ * Xử lý thêm ứng viên mới
+ */
+const handleAddCandidate = () => {
+  showAddModal.value = true
+}
+
+/**
+ * Xử lý lưu ứng viên mới
+ */
+const handleSaveCandidate = (candidateData) => {
+  const result = addCandidate(candidateData)
+  if (result) {
+    showAddModal.value = false
+    success('Thêm ứng viên thành công!')
+  }
+}
+
+/**
+ * Xử lý chỉnh sửa ứng viên
+ * @param {Object} candidate - Candidate object từ MSTable
+ */
+const handleEditCandidate = (candidate) => {
+  selectedCandidate.value = candidate
+  showEditModal.value = true
+}
+
+/**
+ * Xử lý lưu chỉnh sửa ứng viên
+ */
+const handleSaveEditCandidate = (candidateData) => {
+  const result = updateCandidate(candidateData.id, candidateData)
+  if (result) {
+    success('Cập nhật ứng viên thành công!')
+    showEditModal.value = false
+    selectedCandidate.value = null
+  } else {
+    error('Có lỗi xảy ra khi cập nhật ứng viên')
+  }
+}
+
+/**
+ * Xử lý xóa ứng viên
+ * @param {Object} candidate - Candidate object từ MSTable
+ */
+const handleDeleteCandidate = (candidate) => {
+  if (confirm(`Bạn có chắc muốn xóa ứng viên "${candidate.fullName}"?`)) {
+    const result = deleteCandidate(candidate.id)
+    if (result) {
+      success('Xóa ứng viên thành công!')
+      // Điều chỉnh page nếu page hiện tại không còn data
+      if (paginatedCandidates.value.length === 0 && currentPage.value > 1) {
+        currentPage.value--
+      }
+    } else {
+      error('Có lỗi xảy ra khi xóa ứng viên')
     }
   }
 }
 
-// Get rating stars
+/**
+ * Xử lý đóng modals
+ */
+const handleCloseModal = () => {
+  showAddModal.value = false
+  showEditModal.value = false
+  selectedCandidate.value = null
+}
+// ============================================
+// PHẦN 6: METHODS - SELECTION MANAGEMENT
+// ============================================
+
+/**
+ * Xử lý thay đổi selection từ MSTable
+ * @param {Array} selected - Array of selected candidates
+ */
+const handleSelectionChange = (selected) => {
+  selectedCandidates.value = selected
+  console.log('Selected candidates:', selected.length)
+
+  // TODO: Có thể thêm bulk actions ở đây
+  // - Bulk delete
+  // - Bulk export
+  // - Bulk change status
+}
+
+// ============================================
+// PHẦN 7: METHODS - PAGINATION
+// ============================================
+
+/**
+ * Chuyển trang
+ */
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+  }
+}
+
+/**
+ * Thay đổi số bản ghi/trang
+ */
+const changePageSize = (event) => {
+  pageSize.value = parseInt(event)
+  currentPage.value = 1 // Reset về trang 1
+}
+
+// ============================================
+// PHẦN 8: HELPER METHODS
+// ============================================
+
+/**
+ * Tạo rating stars
+ */
 const getRatingStars = (rating) => {
   return '★'.repeat(rating) + '☆'.repeat(5 - rating)
 }
 
-// Check if candidate has image avatar
+/**
+ * Check if candidate has image avatar
+ */
 const hasImageAvatar = (candidate) => {
   return candidate.avatar && candidate.avatar.trim() !== ''
-}
-
-// Switch demo mode
-const switchMode = (mode) => {
-  demoMode.value = mode
-  selectedRows.value = []
 }
 </script>
 
 <template>
-  <div class="page-container">
-    <div class="page-header">
-      <h1>MSTable Demo - {{ demoMode === 'job' ? 'Công việc' : 'Ứng viên' }}</h1>
-      <div class="demo-switch">
-        <button :class="['btn-switch', { active: demoMode === 'job' }]" @click="switchMode('job')">
-          Danh sách công việc
-        </button>
-        <button
-          :class="['btn-switch', { active: demoMode === 'candidate' }]"
-          @click="switchMode('candidate')"
-        >
-          Demo Candidate Table
-        </button>
-      </div>
-    </div>
-
-    <!-- Job Table -->
-    <div v-if="demoMode === 'job'" class="page-content">
-      <div class="info-box">
-        <h3>MSTable Basic - Danh sách công việc</h3>
-        <p>Features: Custom slot, Date format, Edit/Delete actions</p>
+  <div class="candidate-page">
+    <div class="candidate-page-main">
+      <!-- ============================================ -->
+      <!-- PAGE HEADER - Giữ nguyên như cũ -->
+      <!-- ============================================ -->
+      <div class="page-header display-flex justify-content-space-between align-items-center">
+        <h1 class="page-title">Ứng viên</h1>
+        <div>
+          <MSButton
+            label="Thêm ứng viên"
+            type="primary"
+            iconLeft="icon icon-add-candidate"
+            iconRight="icon icon-arrow-down"
+            @click="handleAddCandidate"
+          />
+        </div>
       </div>
 
-      <MSTable :fields="jobFields" :rows="jobRows" @edit="handleEdit" @delete="handleDelete">
-        <!-- Custom slot cho tên công việc -->
-        <template #jobName="{ row }">
-          <strong style="color: #1890ff">{{ row.jobName }}</strong>
-        </template>
-      </MSTable>
-    </div>
-
-    <!-- Candidate Table -->
-    <div v-else class="page-content">
-      <div class="info-box candidate-demo">
-        <h3>MSTable Advanced - Demo Candidate Style</h3>
-        <p><strong>Các tính năng mới:</strong></p>
-        <ul>
-          <li>Checkbox selection ({{ selectedRows.length }} selected)</li>
-          <li>Avatar với text + color</li>
-          <li>Status badge với màu động</li>
-          <li>Rating stars custom</li>
-          <li>Horizontal scroll</li>
-          <li>Floating action buttons</li>
-        </ul>
-      </div>
-
-      <MSTable
-        :fields="candidateFields"
-        :rows="candidateRows"
-        v-model:selected="selectedRows"
-        :selectable="true"
-        :scrollable="true"
-        @edit="handleEdit"
-        @delete="handleDelete"
-      >
-        <!-- Custom slot cho tên với avatar -->
-        <template #fullName="{ row }">
-          <div class="candidate-info">
-            <div class="avatar" :class="getAvatarColorClass(row.avatarColor)">
-              <img
-                v-if="hasImageAvatar(row)"
-                :src="row.avatar"
-                :alt="row.fullName"
-                class="avatar-image"
-              />
-              <span v-else class="avatar-text">
-                {{ row.avatarText }}
-              </span>
-            </div>
-            <div class="candidate-name">
-              <strong>{{ row.fullName }}</strong>
-            </div>
+      <!-- ============================================ -->
+      <!-- TOOLBAR - Giữ nguyên như cũ -->
+      <!-- ============================================ -->
+      <div class="toolbar display-flex align-items-center justify-content-space-between">
+        <!-- Search AI -->
+        <div class="search-ai display-flex align-items-center flex">
+          <div class="search-ai-icon display-flex align-items-center justify-content-center">
+            <button class="img-search-ai img-ct-search-ai"></button>
           </div>
-        </template>
+          <input
+            class="search-ai-input"
+            placeholder="Tìm kiếm hoặc nhờ AI trợ giúp"
+            :value="searchKeyword"
+            @input="handleSearch"
+          />
+        </div>
 
-        <!-- Custom slot cho status badge -->
-        <template #status="{ row }">
-          <span class="badge-status" :class="getStatusClass(row.status)">
-            {{ row.status }}
+        <!-- Toolbar actions -->
+        <div class="toolbar-actions display-flex align-items-center">
+          <button
+            class="btn-icon-only"
+            @click="handleOpenFilter"
+            :title="activeFiltersCount > 0 ? `Đang áp dụng ${activeFiltersCount} bộ lọc` : 'Bộ lọc'"
+          >
+            <div class="icon icon-filter"></div>
+            <span v-if="activeFiltersCount > 0" class="filter-badge">
+              {{ activeFiltersCount }}
+            </span>
+          </button>
+          <button class="btn-icon-only">
+            <div class="icon icon-export"></div>
+          </button>
+          <button class="btn-icon-only">
+            <div class="icon icon-activity"></div>
+          </button>
+          <button class="btn-icon-only">
+            <div class="icon icon-settings"></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- MSTABLE - PHẦN CHÍNH ĐƯỢC REFACTOR -->
+      <!-- ============================================ -->
+      <div class="table-container flex">
+        <MSTable
+          :fields="candidateFields"
+          :rows="paginatedCandidates"
+          v-model:selected="selectedCandidates"
+          :selectable="true"
+          :scrollable="true"
+          :loading="loading"
+          loadingText="Đang tải dữ liệu ứng viên..."
+          emptyText="Không có ứng viên nào"
+          rowKey="id"
+          :showActions="true"
+          @edit="handleEditCandidate"
+          @delete="handleDeleteCandidate"
+        >
+          <!-- ==================== -->
+          <!-- SLOT 1: Full Name với Avatar -->
+          <!-- ==================== -->
+          <template #fullName="{ row }">
+            <div class="candidate-info display-flex align-items-center">
+              <!-- Avatar -->
+              <div
+                class="avatar"
+                :class="{
+                  [getAvatarColorClass(row.avatarColor)]: !hasImageAvatar(row),
+                }"
+              >
+                <!-- Image Avatar -->
+                <img
+                  v-if="hasImageAvatar(row)"
+                  :src="row.avatar"
+                  :alt="row.fullName"
+                  class="avatar-image"
+                />
+                <!-- Text Avatar -->
+                <span v-else class="avatar-text">
+                  {{ row.avatarText }}
+                </span>
+              </div>
+
+              <!-- Candidate Details -->
+              <div class="candidate-details">
+                <div class="candidate-name">
+                  {{ row.fullName }}
+                  <!-- Badge nhân viên -->
+                  <span v-if="row.isEmployee" class="badge-employee"></span>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <!-- ==================== -->
+          <!-- SLOT 2: Status Badge -->
+          <!-- ==================== -->
+          <template #status="{ row }">
+            <span class="badge-status" :class="getStatusClass(row.status)">
+              {{ row.status }}
+            </span>
+          </template>
+
+          <!-- ==================== -->
+          <!-- SLOT 3: Rating Stars -->
+          <!-- ==================== -->
+          <template #rating="{ row }">
+            <span class="rating-stars">
+              {{ getRatingStars(row.rating) }}
+            </span>
+          </template>
+
+          <!-- ==================== -->
+          <!-- SLOT 4: Custom Actions -->
+          <!-- Ẩn actions mặc định của MSTable, dùng floating button -->
+          <!-- ==================== -->
+        </MSTable>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- PAGINATION - Giữ nguyên UI, thêm logic -->
+      <!-- ============================================ -->
+      <div class="pagination display-flex justify-content-space-between align-items-center">
+        <div class="pagination-info">
+          Tổng: <strong>{{ paginationInfo.total }}</strong> bản ghi
+        </div>
+
+        <div class="pagination-controls display-flex align-items-center">
+          <span>Số bản ghi/trang</span>
+          <select
+            class="pagination-select"
+            :value="pageSize"
+            @change="changePageSize($event.target.value)"
+          >
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+
+          <span class="pagination-range">
+            {{ paginationInfo.start }} - {{ paginationInfo.end }} bản ghi
           </span>
-        </template>
 
-        <!-- Custom slot cho rating -->
-        <template #rating="{ row }">
-          <span class="rating-stars">{{ getRatingStars(row.rating) }}</span>
-        </template>
-      </MSTable>
+          <!-- Previous button -->
+          <button
+            class="btn-pagination"
+            :disabled="currentPage === 1"
+            @click="goToPage(currentPage - 1)"
+          >
+            <span>&lt;</span>
+          </button>
 
-      <div class="selected-info" v-if="selectedRows.length > 0">
-        <strong>Đã chọn {{ selectedRows.length }} ứng viên:</strong>
-        {{ selectedRows.map((r) => r.fullName).join(', ') }}
+          <!-- Next button -->
+          <button
+            class="btn-pagination"
+            :disabled="currentPage === totalPages"
+            @click="goToPage(currentPage + 1)"
+          >
+            <span>&gt;</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Selection info - TÍNH NĂNG MỚI -->
+      <div v-if="selectedCandidates.length > 0" class="selection-info">
+        <strong>Đã chọn {{ selectedCandidates.length }} ứng viên</strong>
+        <button class="btn-bulk-action" @click="console.log('Bulk delete')">Xóa đã chọn</button>
+        <button class="btn-bulk-action" @click="console.log('Bulk export')">Export đã chọn</button>
       </div>
     </div>
+
+    <!-- ============================================ -->
+    <!-- MODALS - Giữ nguyên như cũ -->
+    <!-- ============================================ -->
+    <AddCandidateModal :show="showAddModal" @close="handleCloseModal" @save="handleSaveCandidate" />
+
+    <EditCandidateModal
+      :show="showEditModal"
+      :candidate="selectedCandidate"
+      @close="handleCloseModal"
+      @save="handleSaveEditCandidate"
+    />
+
+    <FilterCandidateModal
+      :show="showFilterModal"
+      :filters="filters"
+      @close="handleCloseFilter"
+      @apply="handleApplyFilter"
+      @reset="handleResetFilter"
+    />
   </div>
 </template>
+
 <style scoped>
-.page-container {
-  padding: 24px;
-}
-
-.page-header {
-  margin-bottom: 24px;
+/* ============================================ */
+/* BASE STYLES */
+/* ============================================ */
+.candidate-page {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background-color: #ffffff; /* Đổi thành trắng giống CandidateList */
+  overflow: hidden;
 }
 
-.page-header h1 {
+.candidate-page-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  gap: 8px; /* Giảm gap xuống 8px */
+  padding: 12px 16px; /* Giảm padding để fit viewport */
+  box-sizing: border-box; /* Đảm bảo padding không làm tràn */
+}
+
+/* ============================================ */
+/* PAGE HEADER */
+/* ============================================ */
+.page-header {
+  flex-shrink: 0; /* Không cho phép co lại */
+}
+
+.page-title {
   font-size: 24px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.85);
   margin: 0;
 }
 
-.demo-switch {
-  display: flex;
+/* ============================================ */
+/* TOOLBAR */
+/* ============================================ */
+.toolbar {
+  flex-shrink: 0; /* Không cho phép co lại */
+  gap: 16px;
+}
+
+.search-ai {
+  background: white;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 8px 12px;
   gap: 8px;
 }
 
-.btn-switch {
-  padding: 8px 16px;
+.search-ai-input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+}
+
+.toolbar-actions {
+  gap: 8px;
+}
+
+.btn-icon-only {
+  width: 32px;
+  height: 32px;
   border: 1px solid #d9d9d9;
   background: white;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s;
+  position: relative;
 }
 
-.btn-switch:hover {
-  border-color: #1890ff;
-  color: #1890ff;
-}
-
-.btn-switch.active {
-  background: #1890ff;
+.filter-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ff4d4f;
   color: white;
-  border-color: #1890ff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
 }
 
-.page-content {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+/* ============================================ */
+/* TABLE CONTAINER */
+/* ============================================ */
+.table-container {
+  background: white;
+  border-radius: 0; /* Bỏ border-radius giống CandidateList */
+  padding: 0; /* Bỏ padding bên trong */
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  min-height: 0;
+  border: 1px solid #f0f0f0; /* Thêm border nhẹ */
 }
 
-.info-box {
-  background: #e6f7ff;
-  border: 1px solid #91d5ff;
-  border-radius: 4px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.info-box.candidate-demo {
-  background: #f6ffed;
-  border-color: #b7eb8f;
-}
-
-.info-box h3 {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-  color: rgba(0, 0, 0, 0.85);
-}
-
-.info-box p {
-  margin: 8px 0;
-  color: rgba(0, 0, 0, 0.65);
-}
-
-.info-box ul {
-  margin: 8px 0;
-  padding-left: 20px;
-}
-
-.info-box li {
-  color: rgba(0, 0, 0, 0.65);
-  margin: 4px 0;
-}
-
-/* Candidate Info Styles */
+/* ============================================ */
+/* AVATAR STYLES - QUAN TRỌNG */
+/* ============================================ */
 .candidate-info {
-  display: flex;
-  align-items: center;
   gap: 12px;
 }
 
@@ -415,9 +587,10 @@ const switchMode = (mode) => {
   font-weight: 600;
   color: white;
   text-transform: uppercase;
+  user-select: none;
 }
 
-/* Avatar colors */
+/* Avatar Color Classes */
 .avatar-color-blue {
   background-color: #2196f3;
 }
@@ -446,11 +619,29 @@ const switchMode = (mode) => {
   background-color: #009688;
 }
 
-.candidate-name {
-  font-size: 14px;
+.candidate-details {
+  display: flex;
+  flex-direction: column;
 }
 
-/* Status Badge */
+.candidate-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.badge-employee {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: #52c41a;
+  border-radius: 50%;
+  margin-left: 8px;
+}
+
+/* ============================================ */
+/* STATUS BADGE */
+/* ============================================ */
 .badge-status {
   padding: 2px 8px;
   border-radius: 4px;
@@ -479,43 +670,112 @@ const switchMode = (mode) => {
   color: #f5222d;
 }
 
-/* Rating Stars */
+/* ============================================ */
+/* RATING STARS */
+/* ============================================ */
 .rating-stars {
   color: #fadb14;
   font-size: 16px;
   letter-spacing: 2px;
 }
 
-/* Selected info */
-.selected-info {
-  margin-top: 16px;
-  padding: 12px;
-  background: #e6f7ff;
+/* ============================================ */
+/* PAGINATION */
+/* ============================================ */
+.pagination {
+  flex-shrink: 0;
+  padding: 8px 0; /* Giảm padding */
+  background: transparent; /* Bỏ background */
+  border-radius: 0;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.pagination-controls {
+  gap: 12px;
+}
+
+.pagination-select {
+  padding: 4px 8px;
+  border: 1px solid #d9d9d9;
   border-radius: 4px;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.85);
-}
-</style>
-<style scoped>
-.page-container {
-  padding: 24px;
 }
 
-.page-header {
-  margin-bottom: 24px;
+.pagination-range {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
 }
 
-.page-header h1 {
-  font-size: 24px;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.85);
-  margin: 0;
+.btn-pagination {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d9d9d9;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
-.page-content {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+.btn-pagination:hover:not(:disabled) {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.btn-pagination:disabled {
+  cursor: not-allowed;
+  /* ============================================ */
+  /* BULK ACTIONS */
+  /* ============================================ */
+  .selection-info {
+    flex-shrink: 0; /* Không cho phép co lại */
+    padding: 12px 16px;
+    background: #e6f7ff;
+    border: 1px solid #91d5ff;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-bulk-action {
+  padding: 6px 12px;
+  background: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.btn-bulk-action:hover {
+  background: #40a9ff;
+}
+
+/* ============================================ */
+/* UTILITY CLASSES */
+/* ============================================ */
+.display-flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.justify-content-space-between {
+  justify-content: space-between;
+}
+
+.flex {
+  flex: 1;
 }
 </style>

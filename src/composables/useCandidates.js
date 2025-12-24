@@ -250,7 +250,7 @@ export function useCandidates() {
   const resetToSampleData = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(candidatesData))
     loadCandidates()
-    console.log('🔄 Đã reset về dữ liệu mẫu')
+    console.log('Đã reset về dữ liệu mẫu')
   }
 
   /**

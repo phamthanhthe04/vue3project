@@ -112,5 +112,6 @@ export function getStatusClass(status) {
  * Helper - Lấy class CSS cho màu avatar
  */
 export function getAvatarColorClass(color) {
-  return `avatar-${color}`
+  if (!color) return ''
+  return `avatar-color-${color}`
 }

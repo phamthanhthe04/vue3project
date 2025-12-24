@@ -683,31 +683,31 @@ const hasImageAvatar = (candidate) => {
 }
 
 /* Avatar Colors - Only apply when no image */
-.avatar-pink {
+.avatar-color-pink {
   background: linear-gradient(135deg, #ff6b9d 0%, #ff4081 100%);
 }
 
-.avatar-orange {
+.avatar-color-orange {
   background: linear-gradient(135deg, #ffa726 0%, #ff9800 100%);
 }
 
-.avatar-blue {
+.avatar-color-blue {
   background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
 }
 
-.avatar-cyan {
+.avatar-color-cyan {
   background: linear-gradient(135deg, #26c6da 0%, #00bcd4 100%);
 }
 
-.avatar-teal {
+.avatar-color-teal {
   background: linear-gradient(135deg, #26a69a 0%, #009688 100%);
 }
 
-.avatar-purple {
+.avatar-color-purple {
   background: linear-gradient(135deg, #ab47bc 0%, #9c27b0 100%);
 }
 
-.avatar-green {
+.avatar-color-green {
   background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
 }
 
