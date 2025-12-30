@@ -58,13 +58,11 @@ const headerActions = [
 
 // Handle search
 const handleSearch = () => {
-  console.log('Searching:', searchQuery.value)
   // Implement search logic
 }
 
 // Handle action click
 const handleActionClick = (actionId) => {
-  console.log('Action clicked:', actionId)
   // Implement action handlers
 }
 </script>

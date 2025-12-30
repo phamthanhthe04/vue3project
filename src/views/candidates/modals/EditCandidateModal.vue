@@ -1,10 +1,25 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { Gender, Area, CandidateSource, EducationLevel, CandidateStatus } from '@/utils/enums'
+import {
+  Gender,
+  GenderLabel,
+  Area,
+  AreaLabel,
+  CandidateSource,
+  EducationLevel,
+  CandidateStatus,
+  getEnumOptions,
+} from '@/utils/enums'
 import { VALIDATION_PATTERNS, VALIDATION_MESSAGES } from '@/constants'
 import { useToast } from '@/composables/useToast'
 import MSButton from '@/components/controls/ms-button/MSButton.vue'
 import MSDateInput from '@/components/controls/ms-input/MSDateInput.vue'
+import MSInput from '@/components/controls/ms-input/MSInput.vue'
+import MSInputGroup from '@/components/controls/ms-input/MSInputGroup.vue'
+import MSSelect from '@/components/controls/ms-input/MSSelect.vue'
+import MSFormRow from '@/components/controls/form/FormRow.vue'
+import MSTextarea from '@/components/controls/ms-input/MSTextarea.vue'
+import MSLabel from '@/components/controls/form/MSLabel.vue'
 
 const { success, error } = useToast()
 
@@ -80,8 +95,8 @@ const avatarText = ref('')
 const avatarColor = ref('')
 
 // Enum options
-const genderOptions = Object.values(Gender)
-const areaOptions = Object.values(Area)
+const genderOptions = getEnumOptions(GenderLabel)
+const areaOptions = getEnumOptions(AreaLabel)
 const sourceOptions = Object.values(CandidateSource)
 const educationLevelOptions = Object.values(EducationLevel)
 const statusOptions = Object.values(CandidateStatus)
@@ -248,92 +263,101 @@ const handleOverlayClick = (event) => {
                 <!-- Form fields bên phải -->
                 <div class="form-edit-right">
                   <!-- Họ và tên -->
-                  <div class="form-row-vertical">
-                    <label class="form-label">
-                      Họ và tên <span class="required-star">*</span>
-                    </label>
-                    <input
+                  <MSFormRow layout="vertical">
+                    <MSLabel forId="fullName" required>Họ và tên</MSLabel>
+                    <MSInput
+                      id="fullName"
                       v-model="formData.fullName"
                       type="text"
-                      class="form-input"
+                      width="100%"
                       placeholder="Nhập họ và tên"
                       required
                     />
-                  </div>
+                  </MSFormRow>
 
                   <!-- Ngày sinh & Giới tính -->
-                  <div class="form-row-split-edit">
-                    <div class="form-group-half-edit">
-                      <MSDateInput v-model="formData.dateOfBirth" label="Ngày sinh" />
-                    </div>
-                    <div class="form-group-half-edit">
-                      <label class="form-label">Giới tính</label>
-                      <select v-model="formData.gender" class="form-select">
-                        <option value="">Chọn giới tính</option>
-                        <option v-for="gender in genderOptions" :key="gender" :value="gender">
-                          {{ gender }}
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <!-- Nguồn ứng viên & Ngày ứng tuyển -->
-                  <div class="form-row-split-edit">
-                    <div class="form-group-half-edit">
-                      <label class="form-label">Nguồn ứng viên</label>
-                      <select v-model="formData.source" class="form-select">
-                        <option value="">Chọn nguồn ứng viên</option>
-                        <option v-for="source in sourceOptions" :key="source" :value="source">
-                          {{ source }}
-                        </option>
-                      </select>
-                    </div>
-                    <div class="form-group-half-edit">
-                      <label class="form-label">
-                        Ngày ứng tuyển <span class="required-star">*</span>
-                      </label>
-                      <input
-                        v-model="formData.dateApplied"
-                        type="date"
-                        class="form-input"
-                        required
+                  <MSFormRow layout="split" :gap="'16px'">
+                    <div style="flex: 1; display: flex; flex-direction: column">
+                      <MSLabel forId="dateOfBirth">Ngày sinh</MSLabel>
+                      <MSDateInput
+                        id="dateOfBirth"
+                        v-model="formData.dateOfBirth"
+                        placeholder="dd/MM/yyyy"
+                        width="100%"
                       />
                     </div>
-                  </div>
+                    <div style="flex: 1; display: flex; flex-direction: column">
+                      <MSLabel forId="gender">Giới tính</MSLabel>
+                      <MSSelect
+                        id="gender"
+                        v-model="formData.gender"
+                        :options="genderOptions"
+                        placeholder="Chọn giới tính"
+                        width="100%"
+                      />
+                    </div>
+                  </MSFormRow>
+
+                  <!-- Nguồn ứng viên & Ngày ứng tuyển -->
+                  <MSFormRow layout="split" :gap="'16px'">
+                    <div style="flex: 1; display: flex; flex-direction: column">
+                      <MSLabel forId="source">Nguồn ứng viên</MSLabel>
+                      <MSInputGroup
+                        id="source"
+                        v-model="formData.source"
+                        :options="sourceOptions"
+                        placeholder="Chọn nguồn ứng viên"
+                        width="100%"
+                      />
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column">
+                      <MSLabel forId="dateApplied" required>Ngày ứng tuyển</MSLabel>
+                      <MSDateInput
+                        id="dateApplied"
+                        v-model="formData.dateApplied"
+                        placeholder="dd/MM/yyyy"
+                        :showCalendar="true"
+                        :allowFormatChange="false"
+                        width="100%"
+                      />
+                    </div>
+                  </MSFormRow>
 
                   <!-- Khu vực -->
-                  <div class="form-row-vertical">
-                    <label class="form-label">Khu vực</label>
-                    <select v-model="formData.area" class="form-select">
-                      <option value="">Chọn khu vực</option>
-                      <option v-for="area in areaOptions" :key="area" :value="area">
-                        {{ area }}
-                      </option>
-                    </select>
-                  </div>
+                  <MSFormRow layout="vertical">
+                    <MSLabel forId="area">Khu vực</MSLabel>
+                    <MSInputGroup
+                      id="area"
+                      v-model="formData.area"
+                      :options="areaOptions"
+                      placeholder="Chọn hoặc nhập khu vực"
+                      width="100%"
+                    />
+                  </MSFormRow>
 
                   <!-- Nhân sự khai thác -->
-                  <div class="form-row-vertical">
-                    <label class="form-label">Nhân sự khai thác</label>
-                    <input
+                  <MSFormRow layout="vertical">
+                    <MSLabel forId="recruiter">Nhân sự khai thác</MSLabel>
+                    <MSInput
+                      id="recruiter"
                       v-model="formData.recruiter"
                       type="text"
-                      class="form-input"
+                      width="100%"
                       placeholder="Nhập nhân sự khai thác"
                     />
-                  </div>
+                  </MSFormRow>
 
                   <!-- Cộng tác viên -->
-                  <div class="form-row-vertical">
-                    <label class="form-label">Cộng tác viên</label>
-                    <input
+                  <MSFormRow layout="vertical">
+                    <MSLabel forId="collaborator">Cộng tác viên</MSLabel>
+                    <MSInput
+                      id="collaborator"
                       v-model="formData.collaborator"
                       type="text"
-                      class="form-input"
+                      width="100%"
                       placeholder="Nhập cộng tác viên"
                     />
-                  </div>
-
+                  </MSFormRow>
                   <a href="#" class="form-link-action" @click.prevent>+ Thêm người giới thiệu</a>
                 </div>
               </div>
@@ -344,98 +368,101 @@ const handleOverlayClick = (event) => {
               <h3 class="form-section-title-edit">THÔNG TIN LIÊN HỆ</h3>
 
               <!-- Số điện thoại -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon icon-edit-candidate icon-phone-number"></div>
-                  <label class="form-label-horizontal">Số điện thoại</label>
-                </div>
-                <input
+              <MSFormRow layout="vertical">
+                <MSLabel forId="phone">Số điện thoại</MSLabel>
+                <MSInput
+                  id="phone"
                   v-model="formData.phone"
+                  iconLabel="icon icon-phone-number"
                   type="tel"
-                  class="form-input"
                   placeholder="Nhập số điện thoại"
+                  width="100%"
+                  layout="inline"
                 />
-              </div>
-
+              </MSFormRow>
               <!-- Email -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon icon-edit-candidate icon-email"></div>
-                  <label class="form-label-horizontal">Email</label>
-                </div>
-                <input
+              <MSFormRow layout="vertical">
+                <MSLabel forId="email">Email</MSLabel>
+                <MSInput
+                  id="email"
                   v-model="formData.email"
+                  iconLabel="icon icon-email"
                   type="email"
-                  class="form-input"
                   placeholder="Nhập email"
+                  width="100%"
+                  layout="inline"
                 />
-              </div>
+              </MSFormRow>
 
               <!-- Địa chỉ -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon icon-edit-candidate icon-address"></div>
-                  <label class="form-label-horizontal">Địa chỉ</label>
-                </div>
-                <input
+              <MSFormRow layout="vertical">
+                <MSLabel forId="address">Địa chỉ</MSLabel>
+                <MSInput
+                  id="address"
                   v-model="formData.address"
+                  iconLabel="icon icon-address"
                   type="text"
-                  class="form-input"
                   placeholder="Nhập địa chỉ"
+                  width="100%"
+                  layout="inline"
                 />
-              </div>
+              </MSFormRow>
+
               <!-- Skype -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon icon-edit-candidate icon-skype"></div>
-                  <label class="form-label-horizontal">Skype</label>
-                </div>
-                <input
+              <MSFormRow layout="vertical">
+                <MSLabel forId="skype">Skype</MSLabel>
+                <MSInput
+                  id="skype"
                   v-model="formData.skype"
+                  iconLabel="icon icon-skype"
                   type="text"
-                  class="form-input"
                   placeholder="Nhập Skype"
+                  width="100%"
+                  layout="inline"
                 />
-              </div>
+              </MSFormRow>
+
               <!-- Facebook -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon icon-edit-candidate icon-facebook"></div>
-                  <label class="form-label-horizontal">Facebook</label>
-                </div>
-                <input
+              <MSFormRow layout="vertical">
+                <MSLabel forId="facebook">Facebook</MSLabel>
+                <MSInput
+                  id="facebook"
                   v-model="formData.facebook"
+                  iconLabel="icon icon-facebook"
                   type="text"
-                  class="form-input"
                   placeholder="Nhập Facebook"
+                  width="100%"
+                  layout="inline"
                 />
-              </div>
+              </MSFormRow>
+
               <!-- Zalo -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon icon-edit-candidate icon-zalo"></div>
-                  <label class="form-label -horizontal">Zalo</label>
-                </div>
-                <input
+              <MSFormRow layout="vertical">
+                <MSLabel forId="zalo">Zalo</MSLabel>
+                <MSInput
+                  id="zalo"
                   v-model="formData.zalo"
+                  iconLabel="icon icon-zalo"
                   type="text"
-                  class="form-input"
                   placeholder="Nhập Zalo"
+                  width="100%"
+                  layout="inline"
                 />
-              </div>
+              </MSFormRow>
+
               <!-- LinkedIn/Khác -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon icon-edit-candidate icon-linkedin-other"></div>
-                  <label class="form-label -horizontal">LinkedIn/Khác</label>
-                </div>
-                <input
+              <MSFormRow layout="vertical">
+                <MSLabel forId="linkedinOther">LinkedIn/Khác</MSLabel>
+                <MSInput
+                  id="linkedinOther"
                   v-model="formData.linkedinOther"
+                  iconLabel="icon icon-linker-other"
                   type="text"
-                  class="form-input"
                   placeholder="Nhập LinkedIn/Khác"
+                  width="100%"
+                  layout="inline"
                 />
-              </div>
+              </MSFormRow>
             </div>
 
             <!-- HỌC VẤN -->
@@ -443,50 +470,44 @@ const handleOverlayClick = (event) => {
               <h3 class="form-section-title-edit">HỌC VẤN</h3>
 
               <!-- Trình độ đào tạo -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon-circle-edit"></div>
-                  <label class="form-label-horizontal-left">Trình độ đào tạo</label>
-                </div>
-                <input
+              <MSFormRow>
+                <MSLabel forId="educationLevel">Trình độ đào tạo</MSLabel>
+                <MSInputGroup
+                  id="educationLevel"
                   v-model="formData.educationLevel"
-                  type="text"
-                  class="form-input"
-                  placeholder="Nhập trình độ đào tạo"
-                  :list="'education-levels-edit'"
+                  iconLabel="icon-circle-edit"
+                  :options="educationLevelOptions"
+                  placeholder="Chọn hoặc nhập trình độ đào tạo"
+                  width="100%"
+                  labelInline
                 />
-                <datalist id="education-levels-edit">
-                  <option v-for="level in educationLevelOptions" :key="level" :value="level" />
-                </datalist>
-              </div>
-
+              </MSFormRow>
               <!-- Nơi đào tạo -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon-circle-edit"></div>
-                  <label class="form-label-horizontal-left">Nơi đào tạo</label>
-                </div>
-                <input
+              <MSFormRow>
+                <MSLabel forId="educationPlace">Nơi đào tạo</MSLabel>
+                <MSInput
+                  id="educationPlace"
                   v-model="formData.educationPlace"
+                  iconLabel="icon-circle-edit"
                   type="text"
-                  class="form-input"
                   placeholder="Nhập nơi đào tạo"
+                  width="100%"
+                  layout="inline"
                 />
-              </div>
-
+              </MSFormRow>
               <!-- Chuyên ngành -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon-circle-edit"></div>
-                  <label class="form-label-horizontal-left">Chuyên ngành</label>
-                </div>
-                <input
+              <MSFormRow>
+                <MSLabel forId="major">Chuyên ngành</MSLabel>
+                <MSInput
+                  id="major"
                   v-model="formData.major"
+                  iconLabel="icon-circle-edit"
                   type="text"
-                  class="form-input"
                   placeholder="Nhập chuyên ngành"
+                  width="100%"
+                  layout="inline"
                 />
-              </div>
+              </MSFormRow>
             </div>
 
             <!-- KINH NGHIỆM LÀM VIỆC -->
@@ -494,83 +515,78 @@ const handleOverlayClick = (event) => {
               <h3 class="form-section-title-edit">KINH NGHIỆM LÀM VIỆC</h3>
 
               <!-- Nơi làm việc gần đây -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon-circle-edit"></div>
-                  <label class="form-label-horizontal-left">Nơi làm việc gần đây</label>
-                </div>
-                <input
+              <MSFormRow layout="vertical">
+                <MSLabel forId="recentWorkplace">Nơi làm việc gần đây</MSLabel>
+                <MSInput
+                  id="recentWorkplace"
                   v-model="formData.recentWorkplace"
+                  iconLabel="icon-circle-edit"
                   type="text"
-                  class="form-input"
                   placeholder="Nhập nơi làm việc gần đây"
+                  layout="inline"
                 />
-              </div>
+              </MSFormRow>
 
               <!-- Nơi làm việc -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon-circle-edit"></div>
-                  <label class="form-label-horizontal-left">Nơi làm việc</label>
-                </div>
-                <input
+              <MSFormRow layout="vertical">
+                <MSLabel forId="workplace">Nơi làm việc</MSLabel>
+                <MSInput
+                  id="workplace"
                   v-model="formData.workplace"
+                  iconLabel="icon-circle-edit"
                   type="text"
-                  class="form-input"
                   placeholder="Nhập nơi làm việc"
+                  layout="inline"
                 />
-              </div>
-
+              </MSFormRow>
               <!-- Thời gian -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon-circle-edit"></div>
-                  <label class="form-label-horizontal-left">Thời gian</label>
-                </div>
-                <div class="form-time-range">
-                  <input
+              <MSFormRow layout="split" :gap="'16px'">
+                <div style="flex: 1; display: flex; flex-direction: column">
+                  <MSLabel forId="workPeriodFrom">Thời gian</MSLabel>
+                  <MSInput
+                    id="workPeriodFrom"
                     v-model="formData.workPeriodFrom"
+                    iconLabel="icon-circle-edit"
                     type="text"
-                    class="form-input"
                     placeholder="MM/yyyy"
+                    layout="inline"
                   />
-                  <span class="time-separator">-</span>
-                  <input
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column">
+                  <MSLabel forId="workPeriodTo">&nbsp;</MSLabel>
+                  <MSInput
+                    id="workPeriodTo"
                     v-model="formData.workPeriodTo"
                     type="text"
-                    class="form-input"
                     placeholder="MM/yyyy"
                   />
                 </div>
-              </div>
-
+              </MSFormRow>
               <!-- Vị trí công việc -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon-circle-edit"></div>
-                  <label class="form-label-horizontal-left">Vị trí công việc</label>
-                </div>
-                <input
+              <MSFormRow layout="vertical">
+                <MSLabel forId="jobTitle">Vị trí công việc</MSLabel>
+                <MSInput
+                  id="jobTitle"
                   v-model="formData.jobTitle"
+                  iconLabel="icon-circle-edit"
                   type="text"
-                  class="form-input"
                   placeholder="Nhập vị trí công việc"
+                  layout="inline"
                 />
-              </div>
-
+              </MSFormRow>
               <!-- Mô tả công việc -->
-              <div class="form-row-horizontal">
-                <div class="form-row-label-left">
-                  <div class="icon-circle-edit"></div>
-                  <label class="form-label-horizontal-left">Mô tả công việc</label>
-                </div>
-                <textarea
+              <MSFormRow layout="vertical">
+                <MSLabel forId="jobDescription">Mô tả công việc</MSLabel>
+                <MSTextarea
+                  id="jobDescription"
                   v-model="formData.jobDescription"
-                  class="form-textarea"
-                  rows="4"
+                  iconLabel="icon-circle-edit"
                   placeholder="Nhập mô tả công việc"
-                ></textarea>
-              </div>
+                  :rows="4"
+                  width="100%"
+                  layout="inline"
+                />
+              </MSFormRow>
             </div>
 
             <!-- Trường tùy chỉnh -->
@@ -620,7 +636,6 @@ const handleOverlayClick = (event) => {
 }
 
 .form-edit-left {
-  width: 80px;
   flex-shrink: 0;
 }
 

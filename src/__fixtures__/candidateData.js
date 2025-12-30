@@ -5,7 +5,7 @@ import {
   EducationLevel,
   AvatarColor,
   Area,
-} from './enums'
+} from '@/utils/enums'
 
 /**
  * Danh sách ứng viên - Dữ liệu mẫu

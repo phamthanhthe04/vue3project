@@ -1,0 +1,19 @@
+.base-table-container {
+  background-color: #ffffff;
+  overflow: auto;
+  min-height: 0;
+}
+
+/* Keep `.data-table` visuals consistent with existing styles in views; the page-level CSS will still style `.data-table` */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1400px;
+}
+
+.data-table thead {
+  background-color: #f5f7fa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}

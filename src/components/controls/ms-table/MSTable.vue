@@ -1,9 +1,4 @@
 <template>
-  <!----
-  -ccontainer chính của table
-  - thêm class động dựa trên props
-  -scrollable: cho phép scroll ngang khi table quá rộng
-  -->
   <div
     class="base-table"
     :class="{ 'base-table--scrollable': scrollable, 'base-table--loading': loading }"
@@ -11,7 +6,7 @@
     <!-------Loading overlay-->
     <div v-if="loading" class="table-loading">
       <span class="loading-spinner"></span>
-      <p>{{ LoadingText }}</p>
+      <p>{{ loadingText }}</p>
     </div>
     <table>
       <!--------Header table   -->
@@ -31,12 +26,7 @@
           <th
             v-for="field in fields"
             :key="field.key"
-            :class="[
-              field.class,
-              {
-                sortable: field.sortable,
-              },
-            ]"
+            :class="[field.class, { sortable: field.sortable }]"
             :style="{ width: field.width }"
             @click="field.sortable && handleSort(field.key)"
           >
@@ -63,7 +53,7 @@
 
       <tbody>
         <!--------Loading state-->
-        <tr v-if="loading && row.length === 0">
+        <tr v-if="loading && rows.length === 0">
           <td :colspan="totalColumns" class="text-center">
             {{ loadingText }}
           </td>
@@ -87,7 +77,7 @@
             'row-hovered': hoveredRowKey === getRowKey(row, rowIndex),
           }"
           @click="handleRowClick(row)"
-          @mouseenter="handleRowMouseEnter(row, rowIndex)"
+          @mouseenter="(e) => handleRowMouseEnter(row, rowIndex, e)"
           @mouseleave="handleRowMouseLeave"
         >
           <!----------Checkbox-cell-->
@@ -100,57 +90,41 @@
           </td>
 
           <!----------Loop qua các columns để hiển thị dữ liệu-->
-          <td v-for="field in fields" :key="field.key" :class="field.class">
-            <!-- 
-              Rendering chiến lược:
-              1. Nếu có slot custom -> dùng slot
-              2. Nếu không -> format theo type
-            -->
-
-            <!-- Custom slot cho cell này -->
-
-            <slot
-              v-if="field.type === 'custom'"
-              :name="field.key"
-              :row="row"
-              :field="field"
-              :value="row[field.key]"
-            >
-              <!-- Fallback nếu không có slot -->
-              {{ formatValue(row[field.key], field.type) }}
-            </slot>
-            <!-- Auto format theo type -->
+          <td
+            v-for="field in fields"
+            :key="field.key"
+            :class="[field.class, field.key === 'actions' ? 'col-actions' : '']"
+          >
+            <template v-if="field.type === 'custom'">
+              <slot :name="field.key" :row="row" :field="field" :value="row[field.key]">
+                {{ formatValue(row[field.key], field.type) }}
+              </slot>
+            </template>
             <template v-else>
               {{ formatValue(row[field.key], field.type) }}
             </template>
           </td>
-
-          <!-- Floating action buttons (hiện khi hover) -->
-          <div
-            v-if="showActions && hoveredRowKey === getRowKey(row, rowIndex)"
-            class="action-buttons"
-          >
-            <!-- 
-              Cho phép parent custom actions thông qua slot
-              Hoặc dùng default Edit/Delete buttons
-            -->
-            <slot name="actions" :row="row">
-              <!-- Default actions -->
-              <button class="btn-action btn-edit" @click.stop="handleEdit(row)" title="Sửa">
-                <span class="icon-edit">✎</span>
-              </button>
-              <button class="btn-action btn-delete" @click.stop="handleDelete(row)" title="Xóa">
-                <span class="icon-delete">×</span>
-              </button>
-            </slot>
-          </div>
         </tr>
       </tbody>
     </table>
+    <!-- Floating row action (fixed bên phải màn hình) -->
+    <div
+      v-if="hoveredRowKey !== null"
+      class="row-action-fixed"
+      :style="rowActionStyle"
+      @mouseenter="handleActionMouseEnter"
+      @mouseleave="handleActionMouseLeave"
+    >
+      <slot
+        name="row-action"
+        :row="processedRows.find((r, i) => getRowKey(r, i) === hoveredRowKey)"
+      />
+    </div>
   </div>
 </template>
 <script setup>
 import { ref, computed, watch } from 'vue'
+let hideTimer = null
 
 // Props
 const props = defineProps({
@@ -252,7 +226,8 @@ const selectedRows = ref([...props.selected])
 
 // Row đang được hover (lưu key của row)
 const hoveredRowKey = ref(null)
-
+const hoveredRowRect = ref(null)
+const isHoveringAction = ref(false)
 // Cột đang sort
 const sortColumn = ref(null)
 
@@ -295,25 +270,28 @@ const isSomeSelected = computed(() => {
 
 const processedRows = computed(() => {
   let result = [...props.rows]
-
-  // Áp dụng sorting nếu có
   if (sortColumn.value && props.sortable) {
     result.sort((a, b) => {
       const aVal = a[sortColumn.value]
       const bVal = b[sortColumn.value]
+      let comparison = 0
+      if (aVal > bVal) comparison = 1
+      if (aVal < bVal) comparison = -1
+      return sortOrder.value === 'asc' ? comparison : -comparison
     })
-
-    // So sánh giá trị
-    let comparison = 0
-    if (aVal > bVal) comparison = 1
-    if (aVal < bVal) comparison = -1
-
-    // Đảo ngược nếu sort desc
-    return sortOrder.value === 'asc' ? comparison : -comparison
   }
   return result
 })
-
+const rowActionStyle = computed(() => {
+  if (!hoveredRowRect.value) return {}
+  return {
+    position: 'fixed',
+    right: '32px', // Khoảng cách từ lề phải màn hình
+    top: `${hoveredRowRect.value.top + hoveredRowRect.value.height / 2}px`,
+    transform: 'translateY(-50%)',
+    zIndex: 9999,
+  }
+})
 // =====================================================
 // PHẦN 5: WATCHERS (Theo dõi thay đổi)
 // =====================================================
@@ -325,10 +303,9 @@ const processedRows = computed(() => {
 watch(
   () => props.selected,
   (newVal) => {
-    if (!newVal) {
-      selectedRows.value = [...newVal]
-    }
+    if (newVal) selectedRows.value = [...newVal]
   },
+  { deep: true },
 )
 // =====================================================
 // PHẦN 6: METHODS (Các hàm xử lý logic)
@@ -446,16 +423,41 @@ const handleRowClick = (row) => {
  * - Lưu key của row đang hover
  * - Dùng để hiển thị action buttons
  */
-const handleRowMouseEnter = (row, index) => {
+const handleRowMouseEnter = (row, index, event) => {
+  if (hideTimer) {
+    clearTimeout(hideTimer)
+    hideTimer = null
+  }
   hoveredRowKey.value = getRowKey(row, index)
+  const rect = event.currentTarget.getBoundingClientRect()
+  hoveredRowRect.value = { top: rect.top, height: rect.height }
+}
+// Trong script: Thêm hàm xử lý cho menu action
+const handleActionMouseEnter = () => {
+  isHoveringAction.value = true
+  // Hủy lệnh ẩn icon nếu chuột di chuyển từ dòng vào thẳng icon
+  if (hideTimer) {
+    clearTimeout(hideTimer)
+    hideTimer = null
+  }
 }
 
+const handleActionMouseLeave = () => {
+  isHoveringAction.value = false
+  // Khi rời icon, cũng kích hoạt lệnh chờ ẩn
+  handleRowMouseLeave()
+}
 /**
  * Xử lý hover ra khỏi row
  */
 const handleRowMouseLeave = () => {
-  // Để null thay vì clear ngay để action buttons không bị nhấp nháy
-  hoveredRowKey.value = null
+  // Thay vì xóa ngay, chúng ta tạo một "lệnh chờ" xóa
+  hideTimer = setTimeout(() => {
+    if (!isHoveringAction.value) {
+      hoveredRowKey.value = null
+      hoveredRowRect.value = null
+    }
+  }, 150) // Tăng lên 150ms để thao tác mượt hơn
 }
 
 /**
@@ -508,25 +510,19 @@ const handleDelete = (row) => {
 <style scoped>
 /* Container */
 .base-table {
+  background-color: #ffffff;
+  overflow: auto;
+  min-height: 0;
+  border: 1px solid #e5e5e5;
+}
+/* Wrapper scroll */
+.base-table-scroll {
   width: 100%;
-  position: relative;
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-/* Scrollable table - cho phép scroll ngang */
-.base-table--scrollable {
   overflow-x: auto;
+  overflow-y: visible;
 }
-
-.base-table--scrollable table {
+.base-table-scroll table {
   min-width: 1200px; /* Đảm bảo table đủ rộng để scroll */
-}
-
-/* Scrollable table */
-.base-table--scrollable {
-  overflow-x: auto;
 }
 
 /* Loading overlay */
@@ -738,5 +734,13 @@ th[style*='width'] + td {
 .btn-delete:hover {
   background: #ff7875;
   transform: scale(1.05);
+}
+.row-action-fixed {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9999;
+  pointer-events: auto;
 }
 </style>

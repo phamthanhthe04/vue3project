@@ -1,11 +1,16 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { Gender, Area, CandidateSource, EducationLevel, CandidateStatus } from '@/utils/enums'
+import { Gender, GenderLabel, getEnumOptions, Area, AreaLabel, CandidateSource, EducationLevel, CandidateStatus } from '@/utils/enums'
 import { getAvatarText, getRandomAvatarColor } from '@/utils/avatarHelper'
 import { VALIDATION_PATTERNS, VALIDATION_MESSAGES, DEFAULT_VALUES } from '@/constants'
 import { useToast } from '@/composables/useToast'
 import MSButton from '@/components/controls/ms-button/MSButton.vue'
 import MSDateInput from '@/components/controls/ms-input/MSDateInput.vue'
+import MSInput from '@/components/controls/ms-input/MSInput.vue'
+import MSFormRow from '@/components/controls/form/FormRow.vue'
+import MSInputGroup from '@/components/controls/ms-input/MSInputGroup.vue'
+import MSSelect from '@/components/controls/ms-input/MSSelect.vue'
+import MSLabel from '@/components/controls/form/MSLabel.vue'
 
 const { success, error } = useToast()
 
@@ -58,8 +63,8 @@ const avatarPreview = ref('')
 const avatarInput = ref(null)
 
 // Enum options
-const genderOptions = Object.values(Gender)
-const areaOptions = Object.values(Area)
+const genderOptions = getEnumOptions(GenderLabel)
+const areaOptions = getEnumOptions(AreaLabel)
 const sourceOptions = Object.values(CandidateSource)
 const educationLevelOptions = Object.values(EducationLevel)
 
@@ -214,285 +219,280 @@ onMounted(() => {
 
             <!-- Form Fields -->
             <div class="form-add-candidate-right">
-        <!-- Họ và tên -->
-        <div class="form-row-full">
-          <label class="form-label"> Họ và tên <span class="required-star">*</span> </label>
-          <input
-            v-model="formData.fullName"
-            type="text"
-            class="form-input"
-            placeholder="Nhập họ và tên"
-            required
-          />
-        </div>
-
-        <!-- Ngày sinh & Giới tính -->
-        <div class="form-row-split">
-          <div class="form-group-half">
-            <MSDateInput
-              v-model="formData.dateOfBirth"
-              label="Ngày sinh"
-            />
-          </div>
-          <div class="form-group-half">
-            <label class="form-label">Giới tính</label>
-            <select v-model="formData.gender" class="form-select">
-              <option value="">Chọn giới tính</option>
-              <option v-for="gender in genderOptions" :key="gender" :value="gender">
-                {{ gender }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Khu vực -->
-        <div class="form-row-full">
-          <label class="form-label">Khu vực</label>
-          <select v-model="formData.area" class="form-select">
-            <option value="">Chọn khu vực</option>
-            <option v-for="area in areaOptions" :key="area" :value="area">
-              {{ area }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Số điện thoại & Email -->
-        <div class="form-row-split">
-          <div class="form-group-half">
-            <label class="form-label"> Số điện thoại <span class="required-star">*</span> </label>
-            <input
-              v-model="formData.phone"
-              type="tel"
-              class="form-input"
-              placeholder="Nhập số điện thoại"
-              required
-            />
-          </div>
-          <div class="form-group-half">
-            <label class="form-label">Email</label>
-            <input
-              v-model="formData.email"
-              type="email"
-              class="form-input"
-              placeholder="Nhập Email"
-            />
-          </div>
-        </div>
-
-        <!-- Địa chỉ -->
-        <div class="form-row-full">
-          <label class="form-label">Địa chỉ</label>
-          <input
-            v-model="formData.address"
-            type="text"
-            class="form-input"
-            placeholder="Nhập địa chỉ"
-          />
-        </div>
-
-        <!-- HỌC VẤN Section -->
-        <div class="form-section">
-          <h3 class="form-section-title">HỌC VẤN</h3>
-
-          <!-- Trình độ đào tạo -->
-          <div class="form-row-inline">
-            <label class="form-label-inline">
-              <span class="label-bullet">•</span> Trình độ đào tạo
-            </label>
-            <div class="form-input-with-actions">
-              <div class="form-input-wrapper-with-btn">
-                <input
-                  v-model="formData.educationLevel"
+              <!-- Họ và tên -->
+              <MSFormRow class="inline">
+                <MSLabel forId="fullName" required>Họ và tên</MSLabel>
+                <MSInput 
+                  id="fullName"
+                  v-model="formData.fullName"
                   type="text"
-                  class="form-input"
-                  placeholder="Nhập trình độ đào tạo"
-                  :list="'education-levels'"
+                  width="425"
+                  placeholder="Nhập họ và tên"
+                  required
                 />
-                <datalist id="education-levels">
-                  <option v-for="level in educationLevelOptions" :key="level" :value="level" />
-                </datalist>
-                <button type="button" class="btn-action-inside icon icon-plus"></button>
-              </div>
-              <div class="form-btn-dropdown">
-                <button type="button" class="btn-action-drop icon icon-dropdown"></button>
-              </div>
-            </div>
-          </div>
+              </MSFormRow>
+              
+          
+              <!-- Ngày sinh & Giới tính -->
+              <MSFormRow layout="split" :gap="'8px'" :style="{width: '100%'}">
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <MSLabel forId="dateOfBirth">Ngày sinh</MSLabel>
+                  <MSDateInput
+                    id="dateOfBirth"
+                    v-model="formData.dateOfBirth"
+                    placeholder="dd/MM/yyyy"
+                    width="100%"
+                  />
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <MSLabel forId="gender">Giới tính</MSLabel>
+                  <MSSelect
+                    id="gender"
+                    v-model="formData.gender"
+                    :options="genderOptions"
+                    placeholder="Chọn giới tính"
+                    width="100%"
+                  />
+                </div>
+              </MSFormRow>
+              
+              <!-- Khu vực -->
+              <MSFormRow>
+                <MSLabel forId="area">Khu vực</MSLabel>
+                <MSInputGroup
+                  id="area"
+                  v-model="formData.area"
+                  :options="areaOptions"
+                  placeholder="Chọn hoặc nhập khu vực"
+                  width="425"
+                />
+              </MSFormRow>
 
-          <!-- Nơi đào tạo -->
-          <div class="form-row-inline">
-            <label class="form-label-inline">
-              <span class="label-bullet">•</span> Nơi đào tạo
-            </label>
-            <div class="form-input-with-actions">
-              <div class="form-input-wrapper-with-btn">
-                <input
-                  v-model="formData.educationPlace"
+              <!-- Số điện thoại & Email -->
+              <MSFormRow layout="split" :gap="'8px'" :style="{width: '100%'}">
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <MSLabel forId="phone">Số điện thoại</MSLabel>
+                  <MSInput 
+                    id="phone"
+                    v-model="formData.phone"
+                    type="tel"
+                    width="100%"
+                    placeholder="Nhập số điện thoại"
+                  />
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <MSLabel forId="email">Email</MSLabel>
+                  <MSInput 
+                    id="email"
+                    v-model="formData.email"
+                    type="email"
+                    width="100%"
+                    placeholder="Nhập Email"
+                  />
+                </div>
+              </MSFormRow>
+              <!-- Địa chỉ -->
+              <MSFormRow>
+                <MSLabel forId="address">Địa chỉ</MSLabel>
+                <MSInput 
+                  id="address"
+                  v-model="formData.address"
                   type="text"
-                  class="form-input"
-                  placeholder="Nhập nơi đào tạo"
+                  width="425"
+                  placeholder="Nhập địa chỉ"
                 />
-                <button type="button" class="btn-action-inside icon icon-plus"></button>
+              </MSFormRow>
+              <!-- HỌC VẤN Section -->
+              <div class="form-section">
+                <h3 class="form-section-title">HỌC VẤN</h3>
+                <MSFormRow layout="inline">
+                  <MSLabel forId="educationLevel">Trình độ đào tạo</MSLabel>
+                  <MSInputGroup
+                    id="educationLevel"
+                    bulletIcon="•"
+                    v-model="formData.educationLevel"
+                    :options="educationLevelOptions"
+                    placeholder="Nhập trình độ đào tạo"
+                    showAddButton
+                    showDropdownButton
+                    :addIcon="'icon-plus'"
+                    :dropdownIcon="'icon-arrow-down'"
+                    labelInline
+                    width="100%"
+                  />
+                </MSFormRow>
+                <MSFormRow layout="inline">
+                  <MSLabel forId="educationPlace">Nơi đào tạo</MSLabel>
+                  <MSInputGroup
+                    id="educationPlace"
+                    bulletIcon="•"
+                    v-model="formData.educationPlace"
+                    :options="[]"
+                    placeholder="Nhập nơi đào tạo"
+                    showAddButton
+                    showDropdownButton
+                    labelInline
+                    width="100%"
+                  />
+                </MSFormRow>
+                <MSFormRow layout="inline">
+                  <MSLabel forId="major">Chuyên ngành</MSLabel>
+                  <MSInputGroup
+                    id="major"
+                    bulletIcon="•"
+                    v-model="formData.major"
+                    :options="[]"
+                    placeholder="Nhập chuyên ngành"
+                    showAddButton
+                    showDropdownButton
+                    labelInline
+                    width="100%"
+                  />
+                </MSFormRow>
+                <!-- Link Thêm học vấn -->
+                <div class="form-link-wrapper">
+                  <a href="#" class="form-link-blue" @click.prevent>+ Thêm học vấn</a>
+                </div>
               </div>
-              <div class="form-btn-dropdown">
-                <button type="button" class="btn-action-drop icon icon-dropdown"></button>
-              </div>
-            </div>
-          </div>
 
-          <!-- Chuyên ngành -->
-          <div class="form-row-inline">
-            <label class="form-label-inline">
-              <span class="label-bullet">•</span> Chuyên ngành
-            </label>
-            <div class="form-input-with-actions">
-              <div class="form-input-wrapper-with-btn">
-                <input
-                  v-model="formData.major"
+
+              <!-- Ngày ứng tuyển & Nguồn ứng viên -->
+              <MSFormRow layout="split" :gap="'8px'" :style="{width: '100%'}">
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <MSLabel forId="dateApplied" required>Ngày ứng tuyển</MSLabel>
+                  <MSDateInput
+                    id="dateApplied"
+                    v-model="formData.dateApplied"
+                    placeholder="dd/MM/yyyy"
+                    :showCalendar="true"
+                    :allowFormatChange="false"
+                    width="100%"
+                  />
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <MSLabel forId="source">Nguồn ứng viên</MSLabel>
+                  <MSInputGroup
+                    id="source"
+                    v-model="formData.source"
+                    :options="sourceOptions"
+                    placeholder="Chọn nguồn ứng viên"
+                    width="100%"
+                  />
+                </div>
+              </MSFormRow>
+
+              <!-- Nhân sự khai thác & Cộng tác viên -->
+              <MSFormRow layout="split" :gap="'8px'" :style="{width: '100%'}">
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <MSLabel forId="recruiter">Nhân sự khai thác</MSLabel>
+                  <MSSelect
+                    id="recruiter"
+                    v-model="formData.recruiter"
+                    :options="recruiterOptions"
+                    placeholder="Chọn nhân sự khai thác"
+                    width="100%"
+                  />
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <MSLabel forId="collaborator">Cộng tác viên</MSLabel>
+                  <MSInputGroup
+                    id="collaborator"
+                    v-model="formData.collaborator"
+                    :options="collaboratorOptions"
+                    placeholder="Chọn cộng tác viên"
+                    width="100%"
+                  />
+                </div>
+              </MSFormRow>
+            
+              <!-- Checkbox thêm nhanh -->
+              <div class="form-row-full">
+                <label class="form-checkbox">
+                  <input v-model="formData.addReferrerQuickly" type="checkbox" />
+                  <span>Thêm nhanh người tham chiếu vào kho ứng viên</span>
+                </label>
+              </div>
+            
+              <!-- Link Thêm người giới thiệu -->
+              <div class="form-link-wrapper">
+                <a href="#" class="form-link-blue" @click.prevent>+ Thêm người giới thiệu</a>
+              </div>
+          
+              <!-- Nơi làm việc gần đây -->
+              <MSFormRow>
+                <MSLabel forId="recentWorkplace">Nơi làm việc gần đây</MSLabel>
+                <MSInput
+                  id="recentWorkplace"
+                  v-model="formData.recentWorkplace"
                   type="text"
-                  class="form-input"
-                  placeholder="Nhập chuyên ngành"
+                  placeholder="Nhập nơi làm việc gần đây"
+                  width="100%"
                 />
-                <button type="button" class="btn-action-inside icon icon-plus"></button>
+              </MSFormRow>
+
+              <!-- Link Thêm kinh nghiệm làm việc -->
+              <div class="form-link-wrapper">
+                <a href="#" class="form-link-blue" @click.prevent>+ Thêm kinh nghiệm làm việc</a>
               </div>
-              <div class="form-btn-dropdown">
-                <button type="button" class="btn-action-drop icon icon-dropdown"></button>
-              </div>
-            </div>
-          </div>
 
-          <!-- Link Thêm học vấn -->
-          <div class="form-link-wrapper">
-            <a href="#" class="form-link-blue" @click.prevent>+ Thêm học vấn</a>
-          </div>
-        </div>
+              <!-- Nơi làm việc -->
+              <MSFormRow>
+                <MSLabel forId="workplace">Nơi làm việc</MSLabel>
+                <MSInput
+                  id="workplace"
+                  v-model="formData.workplace"
+                  type="text"
+                  placeholder="Nhập nơi làm việc"
+                  width="100%"
+                />
+              </MSFormRow>
 
-        <!-- Ngày ứng tuyển & Nguồn ứng viên -->
-        <div class="form-row-split">
-          <div class="form-group-half">
-            <label class="form-label"> Ngày ứng tuyển <span class="required-star">*</span> </label>
-            <input
-              v-model="formData.dateApplied"
-              type="text"
-              class="form-input"
-              placeholder="dd/MM/yyyy"
-            />
-          </div>
-          <div class="form-group-half">
-            <label class="form-label">Nguồn ứng viên</label>
-            <select v-model="formData.source" class="form-select">
-              <option value="">Chọn nguồn ứng viên</option>
-              <option v-for="source in sourceOptions" :key="source" :value="source">
-                {{ source }}
-              </option>
-            </select>
-          </div>
-        </div>
+              <!-- Thời gian -->
+              <MSFormRow layout="split" :gap="'8px'" :style="{width: '100%'}">
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <MSLabel forId="workPeriodFrom">Thời gian</MSLabel>
+                  <MSDateInput
+                    id="workPeriodFrom"
+                    v-model="formData.workPeriodFrom"
+                    placeholder="MM/yyyy"
+                    width="100%"
+                    :allowFormatChange="false"
+                  />
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column;">
+                  <MSLabel forId="workPeriodTo">&nbsp;</MSLabel>
+                  <MSDateInput
+                    id="workPeriodTo"
+                    v-model="formData.workPeriodTo"
+                    placeholder="MM/yyyy"
+                    width="100%"
+                    :allowFormatChange="false"
+                  />
+                </div>
+              </MSFormRow>
 
-        <!-- Nhân sự khai thác & Cộng tác viên -->
-        <div class="form-row-split">
-          <div class="form-group-half">
-            <label class="form-label">Nhân sự khai thác</label>
-            <input
-              v-model="formData.recruiter"
-              type="text"
-              class="form-input"
-              placeholder="Nhập nhân sự khai thác"
-            />
-          </div>
-          <div class="form-group-half">
-            <label class="form-label">Cộng tác viên</label>
-            <input
-              v-model="formData.collaborator"
-              type="text"
-              class="form-input"
-              placeholder="Nhập cộng tác viên"
-            />
-          </div>
-        </div>
-
-        <!-- Checkbox thêm nhanh -->
-        <div class="form-row-full">
-          <label class="form-checkbox">
-            <input v-model="formData.addReferrerQuickly" type="checkbox" />
-            <span>Thêm nhanh người tham chiếu vào kho ứng viên</span>
-          </label>
-        </div>
-
-        <!-- Link Thêm người giới thiệu -->
-        <div class="form-link-wrapper">
-          <a href="#" class="form-link-blue" @click.prevent>+ Thêm người giới thiệu</a>
-        </div>
-
-        <!-- Nơi làm việc gần đây -->
-        <div class="form-row-full">
-          <label class="form-label">Nơi làm việc gần đây</label>
-          <input
-            v-model="formData.recentWorkplace"
-            type="text"
-            class="form-input"
-            placeholder="Nhập nơi làm việc gần đây"
-          />
-        </div>
-
-        <!-- Link Thêm kinh nghiệm làm việc -->
-        <div class="form-link-wrapper">
-          <a href="#" class="form-link-blue" @click.prevent>+ Thêm kinh nghiệm làm việc</a>
-        </div>
-
-        <!-- Nơi làm việc -->
-        <div class="form-row-full">
-          <label class="form-label">Nơi làm việc</label>
-          <input
-            v-model="formData.workplace"
-            type="text"
-            class="form-input"
-            placeholder="Nhập nơi làm việc"
-          />
-        </div>
-
-        <!-- Thời gian -->
-        <div class="form-row-split">
-          <div class="form-group-half">
-            <label class="form-label">Thời gian</label>
-            <input
-              v-model="formData.workPeriodFrom"
-              type="text"
-              class="form-input"
-              placeholder="MM/yyyy"
-            />
-          </div>
-          <div class="form-group-half">
-            <label class="form-label">&nbsp;</label>
-            <input
-              v-model="formData.workPeriodTo"
-              type="text"
-              class="form-input"
-              placeholder="MM/yyyy"
-            />
-          </div>
-        </div>
-
-        <!-- Vị trí công việc -->
-        <div class="form-row-full">
-          <label class="form-label">Vị trí công việc</label>
-          <input
-            v-model="formData.jobTitle"
-            type="text"
-            class="form-input"
-            placeholder="Nhập vị trí công việc"
-          />
-        </div>
-
+              <!-- Vị trí công việc -->
+              <MSFormRow>
+                <MSLabel forId="jobTitle">Vị trí công việc</MSLabel>
+                <MSInput
+                  id="jobTitle"
+                  v-model="formData.jobTitle"
+                  type="text"
+                  placeholder="Nhập vị trí công việc"
+                  width="100%"
+                />
+              </MSFormRow>
+          
               <!-- Mô tả công việc -->
               <div class="form-row-full">
-                <label class="form-label">Mô tả công việc</label>
-                <textarea
+                <MSLabel forId="jobDescription">Mô tả công việc</MSLabel>
+                <MSTextarea
+                  id="jobDescription"
                   v-model="formData.jobDescription"
-                  class="form-textarea"
                   rows="4"
                   placeholder="Nhập mô tả công việc"
-                ></textarea>
+                  width="100%"
+                />
               </div>
             </div>
           </form>

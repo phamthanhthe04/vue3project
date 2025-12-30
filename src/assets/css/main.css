@@ -200,15 +200,23 @@
 /* ==================== SIDEBAR ==================== */
 .content .sidebar {
   width: 230px;
-  background: linear-gradient(
-    to bottom,
-    rgba(3, 22, 44, 1) 0%,
-    rgba(10, 35, 65, 0.95) 30%,
-    rgba(24, 55, 84, 0.85) 60%,
-    rgba(24, 55, 84, 0.7) 100%
-  );
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(3, 22, 44, 1) 0%,
+      rgba(10, 35, 65, 0.95) 30%,
+      rgba(24, 55, 84, 0.85) 60%,
+      rgba(24, 55, 84, 0.7) 100%
+    ),
+    url('../images/event-sidebar.86fc6daf7938e471.svg');
+  background-position:
+    top,
+    bottom left;
+  background-size:
+    100%,
+    100% auto;
+  background-repeat: no-repeat;
   padding: 20px 8px 8px;
-  transition: width 0.3s ease;
 }
 
 /* Sidebar collapsed state */

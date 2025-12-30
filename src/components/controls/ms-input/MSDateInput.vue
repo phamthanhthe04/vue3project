@@ -8,7 +8,11 @@ const props = defineProps({
     default: '',
   },
 
-  // Label hiển thị
+  // Label hiển thị (deprecated, dùng MSLabel ngoài)
+  id: {
+    type: String,
+    default: '',
+  },
   label: {
     type: String,
     default: '',
@@ -26,7 +30,7 @@ const props = defineProps({
     default: true,
   },
 
-  // Bắt buộc nhập
+  // Bắt buộc nhập (deprecated, dùng MSLabel ngoài)
   required: {
     type: Boolean,
     default: false,
@@ -122,13 +126,12 @@ const containerClass = computed(() => {
 
 <template>
   <div :class="containerClass">
-    <!-- Label -->
-    <div v-if="label || allowFormatChange" class="ms-date-input__header">
-      <label v-if="label" class="ms-date-input__label">
-        {{ label }}
-        <span v-if="required" class="ms-date-input__required">*</span>
-      </label>
-
+    <!-- Label removed for MSLabel pattern. Use MSLabel outside. -->
+    <div class="ms-date-input__header">
+      <!-- <label class="ms-date-input__label" :style="!label ? 'visibility:hidden;' : ''">
+        {{ label || 'label' }}
+        <span v-if="required && label" class="ms-date-input__required">*</span>
+      </label> -->
       <!-- Format selector -->
       <select
         v-if="allowFormatChange"
@@ -147,6 +150,7 @@ const containerClass = computed(() => {
       <!-- Text input -->
       <input
         ref="inputRef"
+        :id="id"
         :value="modelValue"
         type="text"
         class="ms-date-input__input"
@@ -201,7 +205,6 @@ const containerClass = computed(() => {
   font-size: 14px;
   font-weight: 400;
   color: rgba(0, 0, 0, 0.85);
-  line-height: 1.5715;
   margin: 0;
 }
 
@@ -212,7 +215,6 @@ const containerClass = computed(() => {
 
 /* Format selector */
 .ms-date-input__format-selector {
-  padding: 2px 6px;
   font-size: 14px;
   border: none;
   color: #b7b7b7;
@@ -235,16 +237,13 @@ const containerClass = computed(() => {
 /* Text input */
 .ms-date-input__input {
   flex: 1;
-  padding: 4px 11px;
-  padding-right: 36px; /* Space for calendar icon */
+  padding: 8px 32px 8px 12px;
   font-size: 14px;
   color: rgba(0, 0, 0, 0.85);
   background-color: #ffffff;
   border: 1px solid #d9d9d9;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: all 0.3s;
-  line-height: 1.5715;
-  height: 32px;
   box-sizing: border-box;
 }
 

@@ -1,0 +1,225 @@
+/**
+ * MODAL WRAPPER STYLES
+ * Base styles for all modals (overlay, container, header, body, footer)
+ * Consolidates modal layout from modal-add-candidate.css
+ */
+
+:root {
+  --modal-overlay-bg: rgba(0, 0, 0, 0.45);
+  --modal-container-bg: #ffffff;
+  --modal-border-radius: 6px;
+  --modal-z-index: 9999;
+  --modal-max-height: 85vh;
+  --modal-padding-header: 16px 24px;
+  --modal-padding-body: 24px;
+  --modal-header-font-size: 24px;
+  --modal-header-font-weight: 700;
+  --modal-close-size: 32px;
+  --modal-close-hover-bg: rgba(0, 0, 0, 0.04);
+  --modal-scrollbar-width: 8px;
+  --modal-scrollbar-bg: #f0f0f0;
+  --modal-scrollbar-thumb: #bfbfbf;
+  --modal-scrollbar-thumb-hover: #999999;
+}
+
+/* ==================== MODAL OVERLAY ==================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--modal-overlay-bg);
+  z-index: var(--modal-z-index);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+/* ==================== MODAL CONTAINER ==================== */
+.modal-container {
+  background-color: var(--modal-container-bg);
+  border-radius: var(--modal-border-radius);
+  max-height: var(--modal-max-height);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* ==================== MODAL HEADER ==================== */
+.modal-header {
+  padding: var(--modal-padding-header);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: var(--modal-header-font-size);
+  font-weight: var(--modal-header-font-weight);
+  color: rgba(0, 0, 0, 0.85);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.modal-close {
+  width: var(--modal-close-size);
+  height: var(--modal-close-size);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.45);
+  transition: all 0.3s ease;
+  padding: 0;
+  border-radius: 2px;
+}
+
+.modal-close:hover {
+  color: rgba(0, 0, 0, 0.75);
+  background-color: var(--modal-close-hover-bg);
+}
+
+.modal-close:active {
+  transform: scale(0.95);
+}
+
+/* ==================== MODAL BODY ==================== */
+.modal-body {
+  padding: var(--modal-padding-body);
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Scrollbar styling for webkit browsers */
+.modal-body::-webkit-scrollbar {
+  width: var(--modal-scrollbar-width);
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: var(--modal-scrollbar-bg);
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--modal-scrollbar-thumb);
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--modal-scrollbar-thumb-hover);
+}
+
+/* ==================== MODAL FOOTER ==================== */
+.modal-footer {
+  padding: var(--modal-padding-header);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+  border-top: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+.modal-footer .ms-button {
+  min-width: 80px;
+}
+
+/* ==================== MODAL SIZES ==================== */
+.modal-container.size-small {
+  min-width: 400px;
+  max-width: 500px;
+}
+
+.modal-container.size-medium {
+  min-width: 600px;
+  max-width: 700px;
+}
+
+.modal-container.size-large {
+  min-width: 800px;
+  max-width: 900px;
+}
+
+.modal-container.size-xlarge {
+  min-width: 1000px;
+  max-width: 1200px;
+}
+
+/* ==================== MODAL ANIMATIONS ==================== */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-overlay.active {
+  animation: modalFadeIn 0.3s ease;
+}
+
+.modal-overlay.active .modal-container {
+  animation: modalScaleIn 0.3s ease;
+}
+
+/* ==================== FORM CONTENT WRAPPER ==================== */
+.modal-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .modal-container.size-xlarge {
+    min-width: 90vw;
+    max-width: 90vw;
+  }
+
+  .modal-container.size-large {
+    min-width: 85vw;
+    max-width: 85vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-container {
+    max-height: 95vh;
+    min-width: 95vw;
+    max-width: 95vw;
+  }
+
+  .modal-header {
+    padding: 12px 16px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+  }
+}

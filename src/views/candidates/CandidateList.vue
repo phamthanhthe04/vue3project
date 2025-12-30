@@ -7,6 +7,8 @@ import EditCandidateModal from '../../views/candidates/modals/EditCandidateModal
 import FilterCandidateModal from '../../views/candidates/modals/FilterCandidateModal.vue'
 import MSButton from '@/components/controls/ms-button/MSButton.vue'
 import { useToast } from '@/composables/useToast'
+import MSTable from '@/components/controls/ms-table/MSTable.vue'
+import { candidateFields } from '../job/candidateTableConfig.js'
 
 const { success, error, warning } = useToast()
 
@@ -30,12 +32,6 @@ const showAddModal = ref(false)
 const showEditModal = ref(false)
 const showFilterModal = ref(false)
 const selectedCandidate = ref(null)
-
-// Floating edit button state
-const showEditButton = ref(false)
-const editButtonTop = ref(0)
-const hoveredCandidateId = ref(null)
-
 // Xử lý tìm kiếm
 const handleSearch = (event) => {
   searchCandidates(event.target.value)
@@ -65,32 +61,12 @@ const handleSaveCandidate = (candidateData) => {
   }
 }
 
-// Xử lý hover vào row
-const handleRowMouseEnter = (event, candidate) => {
-  const row = event.currentTarget
-  const rect = row.getBoundingClientRect()
-  editButtonTop.value = rect.top + rect.height / 2
-  hoveredCandidateId.value = candidate.id
-  selectedCandidate.value = candidate
-  showEditButton.value = true
-}
-
-const handleRowMouseLeave = () => {
-  // Không ẩn ngay, sẽ ẩn khi mouse leave khỏi button
-}
-
 // Xử lý click button edit
-const handleEditButtonClick = () => {
-  if (selectedCandidate.value) {
+const handleEditButtonClick = (row) => {
+  if (row) {
+    selectedCandidate.value = row
     showEditModal.value = true
-    showEditButton.value = false
   }
-}
-
-const handleEditButtonMouseLeave = () => {
-  showEditButton.value = false
-  hoveredCandidateId.value = null
-  selectedCandidate.value = null
 }
 
 // Xử lý đóng modal edit
@@ -193,132 +169,63 @@ const hasImageAvatar = (candidate) => {
         </div>
       </div>
 
-      <!--table container-->
-      <div class="table-container flex">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th class="col-checkbox">
-                <input type="checkbox" />
-              </th>
-              <th class="col-phone">Số điện thoại</th>
-              <th class="col-source">Nguồn ứng viên</th>
-              <th class="col-name">Họ và tên</th>
-              <th class="col-email">Email</th>
-              <th class="col-campaign">Chiến dịch tuyển dụng</th>
-              <th class="col-position">Vị trí tuyển dụng</th>
-              <th class="col-job">Tin tuyển dụng</th>
-              <th class="col-status">Vòng tuyển dụng</th>
-              <th class="col-rating">Đánh giá</th>
-              <th class="col-date-applied">Ngày ứng tuyển</th>
-              <th class="col-education-level">Trình độ đào tạo</th>
-              <th class="col-education-place">Nơi đào tạo</th>
-              <th class="col-major">Chuyên ngành</th>
-              <th class="col-recent-workplace">Nơi làm việc gần đây</th>
-              <th class="col-recruiter">Nhân sự khai thác</th>
-              <th class="col-using-unit">Đơn vị sử dụng</th>
-              <th class="col-fit-profile">Phù hợp với chân dung</th>
-              <th class="col-area">Khu vực</th>
-              <th class="col-referrer">Người giới thiệu</th>
-              <th class="col-contact-info">Thông tin tiếp cận</th>
-              <th class="col-potential-warehouse">Thuộc kho tiềm năng</th>
-            </tr>
-          </thead>
-          <tbody id="candidates-table-body">
-            <tr v-if="loading">
-              <td colspan="22" style="text-align: center; padding: 40px">
-                <span>Đang tải dữ liệu...</span>
-              </td>
-            </tr>
-            <tr v-else-if="filteredCandidates.length === 0">
-              <td colspan="22" style="text-align: center; padding: 40px">
-                <span>Không có ứng viên nào</span>
-              </td>
-            </tr>
-            <tr
-              v-else
-              v-for="candidate in filteredCandidates"
-              :key="candidate.id"
-              @mouseenter="handleRowMouseEnter($event, candidate)"
-              @mouseleave="handleRowMouseLeave"
-              class="table-row-hoverable"
-            >
-              <td class="col-checkbox">
-                <input type="checkbox" />
-              </td>
-              <td class="col-phone">{{ candidate.phone }}</td>
-              <td class="col-source">{{ candidate.source }}</td>
-              <td class="col-name">
-                <div class="candidate-info display-flex align-items-center">
-                  <div
-                    class="avatar"
-                    :class="{
-                      [getAvatarColorClass(candidate.avatarColor)]: !hasImageAvatar(candidate),
-                    }"
-                  >
-                    <!-- Image Avatar -->
-                    <img
-                      v-if="hasImageAvatar(candidate)"
-                      :src="candidate.avatar"
-                      :alt="candidate.fullName"
-                      class="avatar-image"
-                    />
-                    <!-- Text Avatar -->
-                    <span v-else class="avatar-text">
-                      {{ candidate.avatarText }}
-                    </span>
-                  </div>
-                  <div class="candidate-details">
-                    <div class="candidate-name">
-                      {{ candidate.fullName }}
-                      <span v-if="candidate.isEmployee" class="badge-employee"></span>
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td class="col-email">{{ candidate.email }}</td>
-              <td class="col-campaign">{{ candidate.campaign || '-' }}</td>
-              <td class="col-position">{{ candidate.position }}</td>
-              <td class="col-job">{{ candidate.job }}</td>
-              <td class="col-status">
-                <span class="badge-status" :class="getStatusClass(candidate.status)">
-                  {{ candidate.status }}
-                </span>
-              </td>
-              <td class="col-rating">
-                <span class="rating-stars">{{ getRatingStars(candidate.rating) }}</span>
-              </td>
-              <td class="col-date-applied">{{ candidate.dateApplied }}</td>
-              <td class="col-education-level">{{ candidate.educationLevel }}</td>
-              <td class="col-education-place">{{ candidate.educationPlace }}</td>
-              <td class="col-major">{{ candidate.major }}</td>
-              <td class="col-recent-workplace">{{ candidate.recentWorkplace }}</td>
-              <td class="col-recruiter">{{ candidate.recruiter }}</td>
-              <td class="col-using-unit">{{ candidate.usingUnit || '-' }}</td>
-              <td class="col-fit-profile">{{ candidate.fitProfile ? 'Có' : 'Không' }}</td>
-              <td class="col-area">{{ candidate.area }}</td>
-              <td class="col-referrer">{{ candidate.referrer || '-' }}</td>
-              <td class="col-contact-info">{{ candidate.contactInfo }}</td>
-              <td class="col-potential-warehouse">
-                {{ candidate.potentialWarehouse ? 'Có' : 'Không' }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Floating Edit Button -->
-      <button
-        v-if="showEditButton"
-        class="floating-edit-btn"
-        :style="{ top: editButtonTop + 'px' }"
-        @click="handleEditButtonClick"
-        @mouseenter="showEditButton = true"
-        @mouseleave="handleEditButtonMouseLeave"
-        title="Sửa thông tin ứng viên"
+      <!--table container dùng MSTable-->
+      <MSTable
+        :fields="candidateFields"
+        :rows="filteredCandidates"
+        :selectable="true"
+        :scrollable="true"
+        :loading="loading"
+        loadingText="Đang tải dữ liệu ứng viên..."
+        emptyText="Không có ứng viên nào"
+        rowKey="id"
+        :showActions="true"
       >
-        <div class="icon icon-edit"></div>
-      </button>
+        <!-- SLOT: Full Name với Avatar -->
+        <template #fullName="{ row }">
+          <div class="candidate-info display-flex align-items-center">
+            <div
+              class="avatar"
+              :class="{
+                [getAvatarColorClass(row.avatarColor)]: !hasImageAvatar(row),
+              }"
+            >
+              <img
+                v-if="hasImageAvatar(row)"
+                :src="row.avatar"
+                :alt="row.fullName"
+                class="avatar-image"
+              />
+              <span v-else class="avatar-text">
+                {{ row.avatarText }}
+              </span>
+            </div>
+            <div class="candidate-details">
+              <div class="candidate-name">
+                {{ row.fullName }}
+                <span v-if="row.isEmployee" class="badge-employee"></span>
+              </div>
+            </div>
+          </div>
+        </template>
+        <!-- SLOT: Status Badge -->
+        <template #status="{ row }">
+          <span class="badge-status" :class="getStatusClass(row.status)">
+            {{ row.status }}
+          </span>
+        </template>
+        <!-- SLOT: Rating Stars -->
+        <template #rating="{ row }">
+          <span class="rating-stars">
+            {{ getRatingStars(row.rating) }}
+          </span>
+        </template>
+        <template #row-action="{ row }">
+          <button class="btn-table-action" title="Sửa" @click.stop="handleEditButtonClick(row)">
+            ✎
+          </button>
+        </template>
+      </MSTable>
 
       <!--pagination-->
       <div class="pagination display-flex justify-content-space-between align-items-center">
@@ -855,14 +762,10 @@ const hasImageAvatar = (candidate) => {
   accent-color: #3990ff;
   margin: 0;
 }
-
-/* ==================== FLOATING EDIT BUTTON ==================== */
-.floating-edit-btn {
-  position: fixed;
-  right: 24px;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
+/* Style cho nút sửa xuất hiện khi hover row */
+.btn-table-action {
+  width: 32px;
+  height: 32px;
   border-radius: 4px;
   border: 1px solid #d9d9d9;
   background-color: #ffffff;
@@ -870,28 +773,16 @@ const hasImageAvatar = (candidate) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #666;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
 }
 
-.floating-edit-btn:hover {
+.btn-table-action:hover {
   background-color: #f5f7fa;
   border-color: #3990ff;
-  box-shadow: 0 4px 12px rgba(57, 144, 255, 0.2);
+  color: #3990ff;
 }
-
-.floating-edit-btn .icon-edit {
-  width: 20px;
-  height: 20px;
-  background-color: #666666;
-  transition: background-color 0.2s ease;
-}
-
-.floating-edit-btn:hover .icon-edit {
-  background-color: #3990ff;
-}
-
 .table-row-hoverable {
   transition: background-color 0.15s ease;
 }

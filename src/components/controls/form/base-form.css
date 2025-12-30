@@ -1,0 +1,21 @@
+/* Base form styles for controls (keeps changes non-invasive)
+   - Use css vars for modal/override sizing so we don't change global layout unexpectedly */
+:root {
+  --form-input-max-width: 100%;
+}
+
+.form-field-control {
+  display: block;
+}
+
+.ms-form-field .form-input {
+  width: 100%;
+  max-width: var(--form-input-max-width);
+  box-sizing: border-box;
+}
+
+/* keep the required star consistent */
+.required-star {
+  color: #ff4d4f;
+  margin-left: 4px;
+}

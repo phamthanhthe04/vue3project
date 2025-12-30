@@ -220,6 +220,7 @@
   width: 14px;
   height: 14px;
   mask-position: -369px -705px;
+  background: #2680eb;
 }
 
 /* icon drop down */
@@ -252,6 +253,8 @@
 
 /* icon số điện thoại */
 .icon-phone-number {
+  width: 16px;
+  height: 16px;
   mask-position: -192px 0;
 }
 
@@ -264,26 +267,36 @@
 
 /* icon địa chỉ */
 .icon-address {
+  width: 16px;
+  height: 16px;
   mask-position: -160px -15px;
 }
 
 /* icon skype */
 .icon-skype {
+  width: 16px;
+  height: 16px;
   mask-position: -240px -80px;
 }
 
 /* icon facebook */
 .icon-facebook {
+  width: 16px;
+  height: 16px;
   mask-position: -240px -64px;
 }
 
 /* icon zalo */
 .icon-zalo {
+  width: 16px;
+  height: 16px;
   mask-position: -366px -140px;
 }
 
 /* icon liên kết khác */
 .icon-linker-other {
+  width: 16px;
+  height: 16px;
   mask-position: -255px -64px;
 }
 
@@ -318,4 +331,22 @@
   width: 16px;
   height: 16px;
   mask-position: -342px -678px;
+}
+/*icon quản lí thẻ*/
+.icon-tag {
+  width: 20px;
+  height: 20px;
+  mask-position: -300px -656px;
+}
+/*icon tạo công việc*/
+.icon-create-job {
+  width: 20px;
+  height: 20px;
+  mask-position: -340px -656px;
+}
+/* icon mở rộng chức năng */
+.icon-more-vertical {
+  width: 16px;
+  height: 16px;
+  mask-position: -96px -80px;
 }

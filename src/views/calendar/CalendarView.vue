@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import MSTable from '../../components/controls/ms-table/MSTable.vue'
+import MSInput from '@/components/controls/ms-input/MSInput.vue'
 
 const pageTitle = ref('Lịch')
 </script>
@@ -12,6 +12,7 @@ const pageTitle = ref('Lịch')
     </div>
     <div class="page-content">
       <p>Trang lịch đang được phát triển...</p>
+      <MSInput v-model="value" label="Họ và tên" placeholder="Nhập họ và tên" required />
     </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
 import { ref, computed, onMounted } from 'vue'
-import { candidatesData } from '../utils/candidateData'
+import { candidatesData } from '../__fixtures__/candidateData'
 
 const STORAGE_KEY = 'candidates-data'
 
@@ -26,9 +26,6 @@ export function useCandidates() {
     const existingData = localStorage.getItem(STORAGE_KEY)
     if (!existingData) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(candidatesData))
-      console.log('Đã khởi tạo dữ liệu ứng viên mẫu trong localStorage')
-    } else {
-      console.log('Dữ liệu ứng viên đã tồn tại trong localStorage')
     }
   }
 
@@ -56,7 +53,6 @@ export function useCandidates() {
     loading.value = true
     try {
       candidates.value = getAllCandidates()
-      console.log(`Đã load ${candidates.value.length} ứng viên`)
     } catch (error) {
       console.error('Lỗi khi load ứng viên:', error)
       candidates.value = []
@@ -91,7 +87,6 @@ export function useCandidates() {
 
       // Cập nhật state
       candidates.value = allCandidates
-      console.log('Đã thêm ứng viên mới:', newCandidate.fullName)
 
       return newCandidate
     } catch (error) {
@@ -122,7 +117,6 @@ export function useCandidates() {
 
       // Cập nhật state
       candidates.value = allCandidates
-      console.log('Đã cập nhật ứng viên:', allCandidates[index].fullName)
 
       return allCandidates[index]
     } catch (error) {
@@ -144,12 +138,11 @@ export function useCandidates() {
         return false
       }
 
-      const deletedCandidate = allCandidates.splice(index, 1)[0]
+      allCandidates.splice(index, 1)
       localStorage.setItem(STORAGE_KEY, JSON.stringify(allCandidates))
 
       // Cập nhật state
       candidates.value = allCandidates
-      console.log('Đã xóa ứng viên:', deletedCandidate.fullName)
 
       return true
     } catch (error) {
@@ -250,7 +243,6 @@ export function useCandidates() {
   const resetToSampleData = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(candidatesData))
     loadCandidates()
-    console.log('Đã reset về dữ liệu mẫu')
   }
 
   /**
@@ -259,7 +251,6 @@ export function useCandidates() {
   const clearAllData = () => {
     localStorage.removeItem(STORAGE_KEY)
     candidates.value = []
-    console.log('Đã xóa tất cả dữ liệu')
   }
 
   // Khởi tạo khi component mount

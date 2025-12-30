@@ -1,0 +1,239 @@
+/**
+ * BASE MODAL STYLES
+ * Shared styles cho tất cả modals trong hệ thống
+ * Import file này trong các modal components
+ */
+
+/* ==================== MODAL OVERLAY ==================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  display: flex;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==================== MODAL CONTAINER ==================== */
+.modal-container {
+  background-color: #ffffff;
+  border-radius: 6px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Modal sizes */
+.modal-container--small {
+  width: 400px;
+  max-width: 90vw;
+}
+
+.modal-container--medium {
+  width: 600px;
+  max-width: 90vw;
+}
+
+.modal-container--large {
+  width: 900px;
+  max-width: 95vw;
+}
+
+.modal-container--xlarge {
+  width: 620px;
+  max-width: 95vw;
+}
+
+.modal-container--full {
+  width: 95vw;
+  height: 90vh;
+  max-height: 90vh;
+}
+
+/* ==================== MODAL HEADER ==================== */
+.modal-header {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.85);
+  margin: 0;
+  line-height: 32px;
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.45);
+  transition: all 0.2s;
+  padding: 0;
+  border-radius: 4px;
+}
+
+.modal-close:hover {
+  color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.modal-close:active {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* ==================== MODAL BODY ==================== */
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Custom scrollbar */
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #bfbfbf;
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #999999;
+}
+
+/* ==================== MODAL FOOTER ==================== */
+.modal-footer {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  border-top: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+/* Footer left alignment */
+.modal-footer--left {
+  justify-content: flex-start;
+}
+
+/* Footer center alignment */
+.modal-footer--center {
+  justify-content: center;
+}
+
+/* Footer space between */
+.modal-footer--between {
+  justify-content: space-between;
+}
+
+/* ==================== LOADING STATE ==================== */
+.modal-container--loading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.modal-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f0f0f0;
+  border-top-color: #1890ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .modal-container {
+    width: 95vw !important;
+    max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: 12px 16px;
+  }
+
+  .modal-title {
+    font-size: 20px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .modal-footer {
+    padding: 12px 16px;
+    flex-direction: column;
+  }
+
+  .modal-footer button {
+    width: 100%;
+  }
+}
